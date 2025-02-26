@@ -135,7 +135,7 @@ def analisar_expressao(expressao):
 
             tokens_encontrados.append({
                 'lexema': char,
-                'token': "UNKNOWN",
+                'token': "DESCONHECIDO",
                 'erro': "Caractere não reconhecido.",
                 'linha': linha,
                 'col_ini': col_ini,
