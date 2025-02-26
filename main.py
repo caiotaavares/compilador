@@ -49,7 +49,7 @@ def analisar_expressao(expressao):
             inicio = i
             ponto_encontrado = (char == '.')
             i += 1
-
+ 
             while i < tamanho:
                 prox_char = expressao[i]
                 # Se for dígito, continua
@@ -66,10 +66,13 @@ def analisar_expressao(expressao):
             lexema = expressao[inicio:i]
             # Verifica se há mais de um ponto (caso simples de erro)
             if lexema.count('.') > 1:
-                token_type = "UNKNOWN"
+                token_type = "DESCONHECIDO"
                 erro = "Número inválido (múltiplos pontos)."
             else:
-                token_type = "NUMBER"
+                if '.' in lexema:
+                    token_type = "NUMERO_REAL"
+                else:
+                    token_type = "NUMERO_INTEIRO"
                 erro = ""
 
             # Índice de colunas (iniciando em 1 para ficar mais intuitivo)
@@ -95,7 +98,22 @@ def analisar_expressao(expressao):
             col_fim = i
 
             if char in ['+', '-', '*', '/']:
-                token_type = "OPERATOR"
+                if char == '+':
+                    token_type = "OPERADOR_SOMA"
+                if  char == '-':
+                    token_type = "OPERADOR_SUBTRACAO"
+                if  char == '*':
+                    token_type = "OPERADOR_MULTIPLICACAO"
+                if  char == '/':
+                    token_type = "OPERADOR_DIVISAO"
+                if  char == '(':
+                    token_type = "OPERADOR_ABRE_CHAVES"
+                if  char == ')':
+                    token_type = "OPERADOR_FECHA_CHAVES"
+                if  char == '[':
+                    token_type = "OPERADOR_ABRE_COLCHETES"
+                if  char == '[':
+                    token_type = "OPERADOR_FECHA_COLCHETES"
             else:
                 token_type = "PAREN"
 
