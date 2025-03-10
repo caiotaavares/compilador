@@ -157,15 +157,19 @@ def popular_tabela_lexemas(tree, tokens):
         tree.delete(item)
 
     # Insere os novos tokens
+        
     for t in tokens:
-        tree.insert("", "end", values=(
-            t['lexema'],
-            t['token'],
-            t['erro'],
-            t['linha'],
-            t['col_ini'],
-            t['col_fim']
-        ))
+        # Define a tag se for um token desconhecido
+        tags = ('erro',) if t['token'] == "DESCONHECIDO" else ()
+        
+        tree.insert(
+            "", "end", 
+            values=(
+                t['lexema'], t['token'], t['erro'],
+                t['linha'], t['col_ini'], t['col_fim']
+            ),
+            tags=tags  # Aplica a tag aqui
+        )
 
 # ------------------------------------------------------------------------------
 # 3. Função de callback para o menu "Executar"
@@ -293,6 +297,9 @@ def criar_bloco_inferior(root):
     tree_lexemas.pack(expand=True, fill="both")
 
     notebook.add(frame_lexemas, text="Tabela de Lexemas")
+    
+    tree_lexemas.tag_configure('erro', background='#e34e49')  # Fundo vermelho
+
 
     return tree_lexemas
 
