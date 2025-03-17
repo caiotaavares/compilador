@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+import re
 
 def criar_janela_principal():
     """Cria a janela principal e retorna o objeto root."""
@@ -21,129 +22,110 @@ def criar_janela_principal():
 # ------------------------------------------------------------------------------
 # 1. Função de análise léxica
 # ------------------------------------------------------------------------------
+import re
+
 def analisar_expressao(expressao):
-    """
-    Faz uma análise léxica simples da expressão.
-    Retorna uma lista de dicionários com as chaves:
-      - lexema
-      - token
-      - erro
-      - linha
-      - col_ini
-      - col_fim
-    """
+    """Faz uma análise léxica completa da expressão usando regex."""
     tokens_encontrados = []
-    linha = 1  # Para simplificar, consideramos que tudo está na linha 1
-    i = 0
+    linha = 1  # Para simplificar, consideramos que tudo começa na linha 1
+
+    # Tabela de palavras reservadas
+    palavras_reservadas = {
+        "program": "PALAVRA_RESERVADA_PROGRAM",
+        "begin": "PALAVRA_RESERVADA_BEGIN",
+        "end": "PALAVRA_RESERVADA_END",
+        "if": "PALAVRA_RESERVADA_IF",
+        "then": "PALAVRA_RESERVADA_THEN",
+        "else": "PALAVRA_RESERVADA_ELSE",
+        "while": "PALAVRA_RESERVADA_WHILE",
+        "do": "PALAVRA_RESERVADA_DO",
+        "procedure": "PALAVRA_RESERVADA_PROCEDURE",
+        "var": "PALAVRA_RESERVADA_VAR",
+        "int": "PALAVRA_RESERVADA_INT",
+        "boolean": "PALAVRA_RESERVADA_BOOLEAN",
+        "true": "PALAVRA_RESERVADA_TRUE",
+        "false": "PALAVRA_RESERVADA_FALSE",
+        "read": "PALAVRA_RESERVADA_READ",
+        "write": "PALAVRA_RESERVADA_WRITE"
+    }
+
+    # Definição das expressões regulares
+    regex_tokens = [
+        (r'\b(program|begin|end|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\b', lambda match: ('PALAVRA_RESERVADA_' + match.group(0).upper(), match.group(0))),
+        (r'[a-zA-Z_][a-zA-Z0-9_]*', lambda match: ('IDENTIFICADOR', match.group(0))),
+        (r'\d+(\.\d+)?', lambda match: ('NUMERO_REAL' if '.' in match.group(0) else 'NUMERO_INTEIRO', match.group(0))),
+        (r'::=', lambda match: ('ATRIBUICAO', '::=')),
+        (r':', lambda match: ('SEPARADOR', ':')),
+        (r'==', lambda match: ('IGUALDADE', '==')),
+        (r'<>', lambda match: ('DIFERENTE', '<>')),
+        (r'<=', lambda match: ('MENOR_IGUAL', '<=')),
+        (r'>=', lambda match: ('MAIOR_IGUAL', '>=')),
+        (r'<', lambda match: ('MENOR', '<')),
+        (r'>', lambda match: ('MAIOR', '>')),
+        (r'\(', lambda match: ('ABRE_PARENTESES', '(')),
+        (r'\)', lambda match: ('FECHA_PARENTESES', ')')),
+        (r'\{', lambda match: ('ABRE_CHAVES', '{')),
+        (r'\}', lambda match: ('FECHA_CHAVES', '}')),
+        (r'\[', lambda match: ('ABRE_COLCHETES', '[')),
+        (r'\]', lambda match: ('FECHA_COLCHETES', ']')),
+        (r'\+', lambda match: ('OPERADOR_SOMA', '+')),
+        (r'-', lambda match: ('OPERADOR_SUBTRACAO', '-')),
+        (r'\*', lambda match: ('OPERADOR_MULTIPLICACAO', '*')),
+        (r'/', lambda match: ('OPERADOR_DIVISAO', '/')),
+        (r';', lambda match: ('PONTO_E_VIRGULA', ';')),
+        (r',', lambda match: ('VIRGULA', ',')),
+        (r'//.*', lambda match: ('COMENTARIO_LINHA', match.group(0))),  # Comentários de linha
+        (r'{.*?}', lambda match: ('COMENTARIO_BLOCO', match.group(0))),  # Comentários de bloco
+        (r'\s+', None),  # Ignora espaços em branco
+    ]
+
+    # Compila as expressões regulares
+    regex_compiladas = [(re.compile(padrao), acao) for padrao, acao in regex_tokens]
+
+    # Processamento da expressão
+    posicao = 0
     tamanho = len(expressao)
 
-    while i < tamanho:
-        char = expressao[i]
+    while posicao < tamanho:
+        match = None
+        for regex, acao in regex_compiladas:
+            match = regex.match(expressao, posicao)
+            if match:
+                if acao:
+                    lexema = match.group(0)
+                    col_ini = posicao + 1
+                    col_fim = posicao + len(lexema)
+                    token_type, valor = acao(match)
+                    tokens_encontrados.append({
+                        'lexema': lexema,
+                        'token': token_type,
+                        'erro': '',
+                        'linha': linha,
+                        'col_ini': col_ini,
+                        'col_fim': col_fim
+                    })
+                break
 
-        # Ignora espaços em branco e quebras de linha
-        if char in [' ', '\t', '\n', '\r']:
-            if char == '\n':
-                linha += 1
-            i += 1
-            continue
-
-        # Se for dígito ou ponto, tentamos ler um número (int ou float)
-        if char.isdigit() or (char == '.'):
-            inicio = i
-            ponto_encontrado = (char == '.')
-            i += 1
- 
-            while i < tamanho:
-                prox_char = expressao[i]
-                # Se for dígito, continua
-                if prox_char.isdigit():
-                    i += 1
-                # Se for ponto e ainda não encontramos ponto, continua
-                elif prox_char == '.' and not ponto_encontrado:
-                    ponto_encontrado = True
-                    i += 1
-                else:
-                    # Se não for dígito nem ponto, paramos
-                    break
-
-            lexema = expressao[inicio:i]
-            # Verifica se há mais de um ponto (caso simples de erro)
-            if lexema.count('.') > 1:
-                token_type = "DESCONHECIDO"
-                erro = "Número inválido (múltiplos pontos)."
-            else:
-                if '.' in lexema:
-                    token_type = "NUMERO_REAL"
-                else:
-                    token_type = "NUMERO_INTEIRO"
-                erro = ""
-
-            # Índice de colunas (iniciando em 1 para ficar mais intuitivo)
-            col_ini = inicio + 1
-            col_fim = i
-
+        if not match:
+            # Caractere desconhecido
+            lexema = expressao[posicao]
+            col_ini = posicao + 1
+            col_fim = col_ini
             tokens_encontrados.append({
                 'lexema': lexema,
-                'token': token_type,
-                'erro': erro,
+                'token': 'DESCONHECIDO',
+                'erro': 'Caractere não reconhecido.',
                 'linha': linha,
                 'col_ini': col_ini,
                 'col_fim': col_fim
             })
-
-        # Se for um operador simples ou parêntese
-        elif char in ['+', '-', '*', '/', '(', ')']:
-            inicio = i
-            i += 1
-
-            # Índice de colunas
-            col_ini = inicio + 1
-            col_fim = i
-
-            if char in ['+', '-', '*', '/']:
-                if char == '+':
-                    token_type = "OPERADOR_SOMA"
-                if  char == '-':
-                    token_type = "OPERADOR_SUBTRACAO"
-                if  char == '*':
-                    token_type = "OPERADOR_MULTIPLICACAO"
-                if  char == '/':
-                    token_type = "OPERADOR_DIVISAO"
-                if  char == '(':
-                    token_type = "OPERADOR_ABRE_CHAVES"
-                if  char == ')':
-                    token_type = "OPERADOR_FECHA_CHAVES"
-                if  char == '[':
-                    token_type = "OPERADOR_ABRE_COLCHETES"
-                if  char == '[':
-                    token_type = "OPERADOR_FECHA_COLCHETES"
-            else:
-                token_type = "PAREN"
-
-            tokens_encontrados.append({
-                'lexema': char,
-                'token': token_type,
-                'erro': "",
-                'linha': linha,
-                'col_ini': col_ini,
-                'col_fim': col_fim
-            })
+            posicao += 1
         else:
-            # Caracter desconhecido
-            inicio = i
-            i += 1
+            posicao = match.end()
 
-            col_ini = inicio + 1
-            col_fim = i
-
-            tokens_encontrados.append({
-                'lexema': char,
-                'token': "DESCONHECIDO",
-                'erro': "Caractere não reconhecido.",
-                'linha': linha,
-                'col_ini': col_ini,
-                'col_fim': col_fim
-            })
+        # Atualiza a contagem de linhas
+        if '\n' in expressao[posicao:]:
+            linha += expressao[posicao:].count('\n')
 
     return tokens_encontrados
 
