@@ -159,18 +159,41 @@ def popular_tabela_lexemas(tree, tokens):
 # ------------------------------------------------------------------------------
 # 3. Função de callback para o menu "Executar"
 # ------------------------------------------------------------------------------
-def executar_analise(text_area, tree):
+def executar_analise(text_area, tree, text_log):
     """
     Lê o texto da área principal, analisa e exibe o resultado na Tabela de Lexemas.
+    Também atualiza o Log de Compilação com mensagens de sucesso ou erro.
     """
+    # Obtém o texto da área principal
     expressao = text_area.get("1.0", tk.END).strip()
+    
+    # Realiza a análise léxica
     tokens = analisar_expressao(expressao)
+    
+    # Limpa a tabela de lexemas antes de inserir novos resultados
     popular_tabela_lexemas(tree, tokens)
-
+    
+    # Verifica se há erros nos tokens
+    has_errors = any(token['erro'] for token in tokens)
+    
+    # Limpa o Log de Compilação
+    text_log.config(state='normal')  # Habilita a edição
+    text_log.delete('1.0', tk.END)   # Limpa o conteúdo
+    
+    # Exibe a mensagem apropriada no Log de Compilação
+    if has_errors:
+        text_log.insert('1.0', "Erro de compilação")
+        text_log.config(foreground='red')  # Define a cor do texto como vermelho
+    else:
+        text_log.insert('1.0', "Compilação completa")
+        text_log.config(foreground='green')  # Define a cor do texto como verde
+    
+    # Desabilita a edição após a atualização
+    text_log.config(state='disabled')
 # ------------------------------------------------------------------------------
 # 4. Criação do Menu
 # ------------------------------------------------------------------------------
-def criar_menu(root, text_area, tree):
+def criar_menu(root, text_area, tree, text_log):
     """Cria a barra de menu e adiciona ao root."""
     menubar = tk.Menu(root)
 
@@ -202,12 +225,14 @@ def criar_menu(root, text_area, tree):
     menubar.add_cascade(label="Compiler", menu=menu_compiler)
 
     # Menu "Executar" - faz a análise e preenche a tabela
+    # Menu "Executar" - faz a análise e preenche a tabela
     menu_executar = tk.Menu(menubar, tearoff=False)
     menu_executar.add_command(
         label="Executar Análise",
-        command=lambda: executar_analise(text_area, tree)
+        command=lambda: executar_analise(text_area, tree, text_log)
     )
     menubar.add_cascade(label="Executar", menu=menu_executar)
+    
 
     # Menu "Ajuda"
     menu_ajuda = tk.Menu(menubar, tearoff=False)
@@ -297,7 +322,7 @@ def criar_area_principal(root):
 # 7. Criação do bloco inferior com Notebook (duas abas)
 # ------------------------------------------------------------------------------
 def criar_bloco_inferior(root):
-    """Cria o bloco inferior com abas. Retorna o Treeview da aba 'Tabela de Lexemas'."""
+    """Cria o bloco inferior com abas. Retorna o Treeview da aba 'Tabela de Lexemas' e o Text do Log."""
     notebook = ttk.Notebook(root)
     notebook.grid(row=1, column=0, sticky="nsew")
 
@@ -309,36 +334,18 @@ def criar_bloco_inferior(root):
 
     # Frame para "Tabela de Lexemas"
     frame_lexemas = ttk.Frame(notebook)
-    # Criamos uma Treeview para exibir as colunas: Lexema, Token, Erro, Linha, ColIni, ColFim
     colunas = ("Lexema", "Token", "Erro", "Linha", "ColIni", "ColFim")
     tree_lexemas = ttk.Treeview(frame_lexemas, columns=colunas, show="headings", height=8)
     
     # Configura o heading (título das colunas)
-    tree_lexemas.heading("Lexema", text="Lexema")
-    tree_lexemas.heading("Token", text="Token")
-    tree_lexemas.heading("Erro", text="Erro")
-    tree_lexemas.heading("Linha", text="Linha")
-    tree_lexemas.heading("ColIni", text="Col. Inicial")
-    tree_lexemas.heading("ColFim", text="Col. Final")
-
-    # Ajusta a largura de cada coluna (opcional)
-    tree_lexemas.column("Lexema", width=100)
-    tree_lexemas.column("Token", width=100)
-    tree_lexemas.column("Erro", width=150)
-    tree_lexemas.column("Linha", width=50)
-    tree_lexemas.column("ColIni", width=80)
-    tree_lexemas.column("ColFim", width=80)
-
-    # Adiciona o Treeview ao frame
+    for col in colunas:
+        tree_lexemas.heading(col, text=col)
+        tree_lexemas.column(col, width=100)
+    
     tree_lexemas.pack(expand=True, fill="both")
-
     notebook.add(frame_lexemas, text="Tabela de Lexemas")
     
-    tree_lexemas.tag_configure('erro', background='#e34e49')  # Fundo vermelho
-
-
-    return tree_lexemas
-
+    return tree_lexemas, text_log
 # ------------------------------------------------------------------------------
 # 8. Função principal (main)
 # ------------------------------------------------------------------------------
@@ -349,11 +356,11 @@ def main():
     # Cria a área de texto
     text_area = criar_area_principal(root)
 
-    # Cria as abas inferiores e obtém o Treeview para a tabela de lexemas
-    tree_lexemas = criar_bloco_inferior(root)
+    # Cria as abas inferiores e obtém o Treeview e o Text do Log
+    tree_lexemas, text_log = criar_bloco_inferior(root)
 
     # Cria o menu (inclui a opção de "Executar" que faz a análise léxica)
-    criar_menu(root, text_area, tree_lexemas)
+    criar_menu(root, text_area, tree_lexemas, text_log)
 
     # Inicia o loop principal
     root.mainloop()
