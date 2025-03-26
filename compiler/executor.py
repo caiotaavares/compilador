@@ -40,8 +40,15 @@ def executar_analise(text_area, tree, text_log):
     # Obtém o texto da área principal
     expressao = text_area.get("1.0", tk.END).strip()
     
-    # Realiza a análise léxica
-    tokens = analisar_expressao(expressao)
+    try:
+        tokens = analisar_expressao(expressao)
+    except SyntaxError as e:
+        text_log.config(state='normal')
+        text_log.delete('1.0', tk.END)
+        text_log.insert('1.0', f"Erro de compilação: {e}")
+        text_log.config(foreground='red', state='disabled')
+        return
+
     
     # Limpa a tabela de lexemas antes de inserir novos resultados
     popular_tabela_lexemas(tree, tokens)

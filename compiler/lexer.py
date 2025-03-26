@@ -6,7 +6,25 @@ import re
 def analisar_expressao(expressao):
     """Faz uma análise léxica completa da expressão usando regex."""
     tokens_encontrados = []
-    linha = 1  # Para simplificar, consideramos que tudo começa na linha 1
+    linha = 1  # Tudo começa na linha 1
+
+    # Verificação de comentário de bloco não fechado
+    aberturas = [m.start() for m in re.finditer(r'\{', expressao)]
+    fechamentos = [m.start() for m in re.finditer(r'\}', expressao)]
+
+    if len(aberturas) != len(fechamentos):
+        # Localiza a posição do erro (primeira abertura sem fechamento)
+        if len(aberturas) > len(fechamentos):
+            pos_erro = aberturas[len(fechamentos)]
+            linha_erro = expressao.count('\n', 0, pos_erro) + 1
+            raise SyntaxError(f"Erro: comentário de bloco '{{' iniciado na linha {linha_erro} não possui fechamento '}}'.")
+        else:
+            raise SyntaxError("Erro: comentário de bloco '}' sem abertura correspondente.")
+
+    # Limpeza dos comentários
+    expressao = re.sub(r'\{[^}]*\}', '', expressao, flags=re.DOTALL)  # Comentário de bloco
+    expressao = re.sub(r'//.*', '', expressao)  # Comentário de linha
+
 
     # Tabela de palavras reservadas
     palavras_reservadas = {
@@ -25,15 +43,19 @@ def analisar_expressao(expressao):
         "true": "PALAVRA_RESERVADA_TRUE",
         "false": "PALAVRA_RESERVADA_FALSE",
         "read": "PALAVRA_RESERVADA_READ",
-        "write": "PALAVRA_RESERVADA_WRITE"
+        "write": "PALAVRA_RESERVADA_WRITE",
     }
 
     # Definição das expressões regulares
     regex_tokens = [
-        (r'\b(program|begin|end|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\b', lambda match: ('PALAVRA_RESERVADA_' + match.group(0).upper(), match.group(0))),
-        (r'[a-zA-Z_][a-zA-Z0-9_]*', lambda match: ('IDENTIFICADOR', match.group(0))),
-        (r'\d+(\.\d+)?', lambda match: ('NUMERO_REAL' if '.' in match.group(0) else 'NUMERO_INTEIRO', match.group(0))),
-        (r'::=', lambda match: ('ATRIBUICAO', '::=')),
+        (r'\b(program|begin|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\b', lambda match: ('PALAVRA_RESERVADA_' + match.group(0).upper(), match.group(0))),
+        (r'\bend\.', lambda match: ('PALAVRA_RESERVADA_END_PONTO', match.group(0))),
+        (r'\bend\b', lambda match: ('PALAVRA_RESERVADA_END', match.group(0))),
+        # (r'[a-zA-Z_][a-zA-Z0-9_]*', lambda match: ('IDENTIFICADOR', match.group(0))),
+        (r'[a-zA-Z_][a-zA-Z0-9_]*', lambda match: validar_identificador(match)),
+        # (r'\d+(\.\d+)?', lambda match: ('NUMERO_REAL' if '.' in match.group(0) else 'NUMERO_INTEIRO', match.group(0))),
+        (r'\d+(\.\d+)?', lambda match: validar_numero(match)),
+        (r':=', lambda match: ('ATRIBUICAO', '::=')),
         (r':', lambda match: ('SEPARADOR', ':')),
         (r'==', lambda match: ('IGUALDADE', '==')),
         (r'<>', lambda match: ('DIFERENTE', '<>')),
@@ -53,8 +75,8 @@ def analisar_expressao(expressao):
         (r'/', lambda match: ('OPERADOR_DIVISAO', '/')),
         (r';', lambda match: ('PONTO_E_VIRGULA', ';')),
         (r',', lambda match: ('VIRGULA', ',')),
-        (r'//.*', lambda match: ('COMENTARIO_LINHA', match.group(0))),  # Comentários de linha
-        (r'{.*?}', lambda match: ('COMENTARIO_BLOCO', match.group(0))),  # Comentários de bloco
+        # (r'//.*', lambda match: ('COMENTARIO_LINHA', match.group(0))),  # Comentários de linha
+        # (r'{.*?}', lambda match: ('COMENTARIO_BLOCO', match.group(0))),  # Comentários de bloco
         (r'\s+', None),  # Ignora espaços em branco
     ]
 
@@ -75,10 +97,18 @@ def analisar_expressao(expressao):
                     col_ini = posicao + 1
                     col_fim = posicao + len(lexema)
                     token_type, valor = acao(match)
+                    # overflow
+                    erro = ''
+                    if token_type == 'NUMERO_INVALIDO':
+                        erro = 'Número excede o limite permitido (int32).'
+                    # identificador
+                    elif token_type == 'IDENTIFICADOR_INVALIDO':
+                        erro = 'Identificador excede o tamanho máximo permitido (30 caracteres).'
+                
                     tokens_encontrados.append({
                         'lexema': lexema,
                         'token': token_type,
-                        'erro': '',
+                        'erro': erro,
                         'linha': linha,
                         'col_ini': col_ini,
                         'col_fim': col_fim
@@ -107,3 +137,23 @@ def analisar_expressao(expressao):
             linha += expressao[posicao:].count('\n')
 
     return tokens_encontrados
+
+def validar_numero(match):
+    lexema = match.group(0)
+    try:
+        if '.' in lexema:
+            float(lexema)  # tenta converter para float
+            return ('NUMERO_REAL', lexema)
+        else:
+            valor = int(lexema)
+            if valor > 2**31 - 1:
+                raise ValueError("Número inteiro excede o limite de 32 bits")
+            return ('NUMERO_INTEIRO', lexema)
+    except ValueError:
+        return ('NUMERO_INVALIDO', lexema)
+
+def validar_identificador(match, limite=30):
+    lexema = match.group(0)
+    if len(lexema) > limite:
+        return ('IDENTIFICADOR_INVALIDO', lexema)
+    return ('IDENTIFICADOR', lexema)
