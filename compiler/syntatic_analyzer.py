@@ -1,14 +1,13 @@
 # ------------------------------------------------------------------------------
 # ANALISADOR SINTÁTICO
 # ------------------------------------------------------------------------------
-# Gramática para análise sintática de declarações de variáveis
 # decl_var → var lista_decl_var
-# lista_decl_var → lista_id : tipo ; lista_decl_var | ε
+# lista_decl_var → tipo : lista_id ; lista_decl_var | ε
+# tipo → int | boolean
 # lista_id → id lista_id_tail
 # lista_id_tail → , id lista_id_tail | ε
-# tipo → int | boolean
 # ------------------------------------------------------------------------------
-#                                                                               TABELA SINTÁTICA
+# ########## TABELA SINTÁTICA ##########
 # | Não-Terminal      | PALAVRA_RESERVADA_VAR           | IDENTIFICADOR                                         | PALAVRA_RESERVADA_INT   | PALAVRA_RESERVADA_BOOLEAN  | SEPARADOR (`:`)    | PONTO_E_VIRGULA (`;`)     | `$`                   |
 # |-------------------|---------------------------------|-------------------------------------------------------|-------------------------|----------------------------|--------------------|---------------------------|-----------------------|
 # | **decl_var**      | decl_var → var lista_decl_var   | -                                                     | -                       | -                          | -                  | -                         | -                     |
@@ -34,20 +33,20 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_VAR': ['PALAVRA_RESERVADA_VAR', 'lista_decl_var']
     },
     'lista_decl_var': {
-        'IDENTIFICADOR': ['lista_id', 'SEPARADOR', 'tipo', 'PONTO_E_VIRGULA', 'lista_decl_var'],
-        'PALAVRA_RESERVADA_END': ['ε'],
+        'PALAVRA_RESERVADA_INT': ['tipo', 'SEPARADOR', 'lista_id', 'PONTO_E_VIRGULA', 'lista_decl_var'],
+        'PALAVRA_RESERVADA_BOOLEAN': ['tipo', 'SEPARADOR', 'lista_id', 'PONTO_E_VIRGULA', 'lista_decl_var'],
         '$': ['ε'],
+    },
+    'tipo': {
+        'PALAVRA_RESERVADA_INT': ['PALAVRA_RESERVADA_INT'],
+        'PALAVRA_RESERVADA_BOOLEAN': ['PALAVRA_RESERVADA_BOOLEAN']
     },
     'lista_id': {
         'IDENTIFICADOR': ['IDENTIFICADOR', 'lista_id_tail']
     },
     'lista_id_tail': {
         'VIRGULA': ['VIRGULA', 'IDENTIFICADOR', 'lista_id_tail'],
-        'SEPARADOR': ['ε'],
-    },
-    'tipo': {
-        'PALAVRA_RESERVADA_INT': ['PALAVRA_RESERVADA_INT'],
-        'PALAVRA_RESERVADA_BOOLEAN': ['PALAVRA_RESERVADA_BOOLEAN']
+        'PONTO_E_VIRGULA': ['ε'],
     }
 }
 
@@ -87,20 +86,20 @@ def analisar_declaracoes(tokens):
                 for simbolo in reversed(producao):
                     if simbolo != 'ε':
                         pilha.append(simbolo)
-            else:
-                if topo == 'lista_decl_var' and atual == 'IDENTIFICADOR':
-                    # Trata o caso de múltiplas declarações
-                    # var
-                    #   idade: int;
-                    #   ativo: boolean;
-                    # Força uma nova produção lista_decl_var
-                    pilha.append('lista_id')
-                    pilha.append('SEPARADOR')
-                    pilha.append('tipo')
-                    pilha.append('PONTO_E_VIRGULA')
-                    pilha.append('lista_decl_var')
-                else:
-                    raise SyntaxError(f"Erro de sintaxe: esperado algo diferente próximo de '{lexema_atual()}' na linha {tokens[pos]['linha']}")
+            # else:
+            #     if topo == 'lista_decl_var' and atual == 'IDENTIFICADOR':
+            #         # Trata o caso de múltiplas declarações
+            #         # var
+            #         #   idade: int;
+            #         #   ativo: boolean;
+            #         # Força uma nova produção lista_decl_var
+            #         pilha.append('lista_id')
+            #         pilha.append('SEPARADOR')
+            #         pilha.append('tipo')
+            #         pilha.append('PONTO_E_VIRGULA')
+            #         pilha.append('lista_decl_var')
+            #     else:
+            #         raise SyntaxError(f"Erro de sintaxe: esperado algo diferente próximo de '{lexema_atual()}' na linha {tokens[pos]['linha']}")
         else:
             raise SyntaxError(f"Erro de sintaxe: token inesperado '{lexema_atual()}' na linha {tokens[pos]['linha']}")
 
