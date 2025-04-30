@@ -11,13 +11,14 @@
 #                                                                               TABELA SINTÁTICA
 # | Não-Terminal      | PALAVRA_RESERVADA_VAR           | IDENTIFICADOR                                         | PALAVRA_RESERVADA_INT   | PALAVRA_RESERVADA_BOOLEAN  | SEPARADOR (`:`)    | PONTO_E_VIRGULA (`;`)     | `$`                   |
 # |-------------------|---------------------------------|-------------------------------------------------------|-------------------------|----------------------------|--------------------|---------------------------|-----------------------|
-# | **decl_var**      | decl_var → var lista_decl_var   | –                                                     | –                       | –                          | –                  | –                         | –                     |
-# | **lista_decl_var**| –                               | lista_decl_var → lista_id : tipo ; lista_decl_var     | –                       | –                          | –                  | –                         | lista_decl_var → ε    |
-# | **lista_id**      | –                               | lista_id → id lista_id_tail                           | –                       | –                          | –                  | –                         | –                     |
-# | **lista_id_tail** | –                               | –                                                     | –                       | –                          | lista_id_tail → ε  | –                         | –                     |
-# |                   | –                               | –                                                     | –                       | –                          | –                  | –                         | –                     |
-# |                   | –                               | lista_id_tail → , id lista_id_tail                    | –                       | –                          | –                  | –                         | –                     |
-# | **tipo**          | –                               | –                                                     | tipo → int              | tipo → boolean             | –                  | –                         | –                     |
+# | **decl_var**      | decl_var → var lista_decl_var   | -                                                     | -                       | -                          | -                  | -                         | -                     |
+# | **lista_decl_var**| -                               | lista_decl_var → lista_id : tipo ; lista_decl_var     | -                       | -                          | -                  | -                         | lista_decl_var → ε    |
+# | **lista_id**      | -                               | lista_id → id lista_id_tail                           | -                       | -                          | -                  | -                         | -                     |
+# | **lista_id_tail** | -                               | -                                                     | -                       | -                          | lista_id_tail → ε  | -                         | -                     |
+# |                   | -                               | -                                                     | -                       | -                          | -                  | -                         | -                     |
+# |                   | -                               | lista_id_tail → , id lista_id_tail                    | -                       | -                          | -                  | -                         | -                     |
+# | **tipo**          | -                               | -                                                     | tipo → int              | tipo → boolean             | -                  | -                         | -                     |
+
 # ------------------------------------------------------------------------------
 
 # dicionário em Python, onde a chave é o símbolo não terminal e o valor é outro dicionário
