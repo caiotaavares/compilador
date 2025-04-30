@@ -1,4 +1,5 @@
 from compiler.lexer import analisar_expressao
+from compiler.syntatic_analyzer import analisar_declaracoes
 
 import tkinter as tk
 
@@ -28,82 +29,6 @@ def popular_tabela_lexemas(tree, tokens):
             ),
             tags=tags  # Aplica a tag aqui
         )
-
-# ------------------------------------------------------------------------------
-# 1. Função de análise sintática para declarações de variáveis
-# FORMA GERAL
-# decl_var -> 'var' lista_decl_var
-# lista_decl_var -> lista_id ':' tipo ';' lista_decl_var | ε
-# lista_id -> id lista_id_tail
-# lista_id_tail -> ',' id lista_id_tail | ε
-# tipo -> 'int' | 'boolean'
-# id -> IDENTIFICADOR
-# ------------------------------------------------------------------------------
-def analisar_declaracoes(tokens):
-    """
-    Analisa uma sequência de tokens para declaração de variáveis.
-    Levanta exceções se encontrar erros sintáticos.
-    """
-
-    pos = 0
-    tamanho = len(tokens)
-
-    def token_atual():
-        return tokens[pos] if pos < tamanho else None
-
-    def consumir(tipo_esperado):
-        nonlocal pos
-        tok = token_atual()
-        if tok and tok['token'] == tipo_esperado:
-            pos += 1
-        else:
-            esperado = tipo_esperado.replace('PALAVRA_RESERVADA_', '').lower()
-            encontrado = tok['lexema'] if tok else 'EOF'
-            raise SyntaxError(f"Erro de sintaxe: esperado '{esperado}', encontrado '{encontrado}' na linha {tok['linha'] if tok else 'final do arquivo'}.")
-
-    def decl_var():
-        consumir('PALAVRA_RESERVADA_VAR')
-        lista_decl_var()
-
-    def lista_decl_var():
-        tok = token_atual()
-        if tok and tok['token'] == 'IDENTIFICADOR':
-            lista_id()
-            consumir('SEPARADOR')  # Espera ':'
-            tipo()
-            consumir('PONTO_E_VIRGULA')
-            lista_decl_var()
-        # Se não for identificador, pode ser ε (vazio)
-
-    def lista_id():
-        consumir('IDENTIFICADOR')
-        lista_id_tail()
-
-    def lista_id_tail():
-        tok = token_atual()
-        if tok and tok['token'] == 'VIRGULA':
-            consumir('VIRGULA')
-            consumir('IDENTIFICADOR')
-            lista_id_tail()
-        # ε (nada a fazer)
-
-    def tipo():
-        tok = token_atual()
-        if tok and (tok['token'] == 'PALAVRA_RESERVADA_INT' or tok['token'] == 'PALAVRA_RESERVADA_BOOLEAN'):
-            consumir(tok['token'])
-        else:
-            esperado = "'int' ou 'boolean'"
-            encontrado = tok['lexema'] if tok else 'EOF'
-            raise SyntaxError(f"Erro de sintaxe: esperado {esperado}, encontrado '{encontrado}' na linha {tok['linha'] if tok else 'final do arquivo'}.")
-
-    # Início da análise
-    decl_var()
-
-    if pos < tamanho:
-        resto = token_atual()
-        raise SyntaxError(f"Erro: tokens inesperados após declaração de variáveis, começando em '{resto['lexema']}' linha {resto['linha']}.")
-
-    return True  # Análise sintática foi bem-sucedida
 
 # ------------------------------------------------------------------------------
 # 3. Função de callback para o menu "Executar"
