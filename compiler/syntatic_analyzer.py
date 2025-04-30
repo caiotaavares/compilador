@@ -86,26 +86,6 @@ def analisar_declaracoes(tokens):
                 for simbolo in reversed(producao):
                     if simbolo != 'ε':
                         pilha.append(simbolo)
-            # else:
-            #     if topo == 'lista_decl_var' and atual == 'IDENTIFICADOR':
-            #         # Trata o caso de múltiplas declarações
-            #         # var
-            #         #   idade: int;
-            #         #   ativo: boolean;
-            #         # Força uma nova produção lista_decl_var
-            #         pilha.append('lista_id')
-            #         pilha.append('SEPARADOR')
-            #         pilha.append('tipo')
-            #         pilha.append('PONTO_E_VIRGULA')
-            #         pilha.append('lista_decl_var')
-            #     else:
-            #         raise SyntaxError(f"Erro de sintaxe: esperado algo diferente próximo de '{lexema_atual()}' na linha {tokens[pos]['linha']}")
         else:
             raise SyntaxError(f"Erro de sintaxe: token inesperado '{lexema_atual()}' na linha {tokens[pos]['linha']}")
-
-    # if pos != tamanho:
-    #     lexema = tokens[pos]['lexema'] if pos < tamanho else 'EOF'
-    #     linha = tokens[pos]['linha'] if pos < tamanho else 'final do arquivo'
-    #     raise SyntaxError(f"Erro de sintaxe: tokens inesperados após o fim da declaração, começando em '{lexema}' linha {linha}")
-
     return True

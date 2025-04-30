@@ -43,6 +43,7 @@ def executar_analise(text_area, tree, text_log):
     
     try:
         tokens = analisar_expressao(expressao)
+        print(tokens)
         analisar_declaracoes(tokens)
     except SyntaxError as e:
         text_log.config(state='normal')
