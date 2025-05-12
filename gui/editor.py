@@ -9,7 +9,7 @@ def criar_area_principal(root):
      # Frame para conter o contador e o texto
     frame_texto = ttk.Frame(root)
     frame_texto.grid(row=0, column=0, sticky="nsew")
-    frame_texto.columnconfigure(1, weight=1)  # Área principal expande
+    frame_texto.columnconfigure(1, weight=1)
     
     # Widget do contador de linhas (Text com fundo cinza)
     text_line_numbers = tk.Text(

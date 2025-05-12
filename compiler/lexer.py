@@ -6,7 +6,7 @@ import re
 def analisar_expressao(expressao):
     """Faz uma análise léxica completa da expressão usando regex."""
     tokens_encontrados = []
-    linha = 1  # Tudo começa na linha 1
+    linha = 1  # Começa na linha 1
 
     # Verificação de comentário de bloco não fechado
     aberturas = [m.start() for m in re.finditer(r'\{', expressao)]

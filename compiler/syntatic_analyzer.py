@@ -52,23 +52,6 @@ tabela_sintatica = {
     }
 }
 
-tabela_simbolos = SymbolTable()
-
-# Entrar em um novo escopo (ex: ao iniciar um procedure)
-tabela_simbolos.enter_scope()
-
-# Declarar variável
-tabela_simbolos.declare(name='x', type_='int', category='variável')
-
-# Declarar procedimento
-tabela_simbolos.declare(name='fatorial', type_=None, category='procedimento', parameters=[('n', 'int')])
-
-# Consultar
-simbolo = tabela_simbolos.lookup('x')
-print(simbolo.type)  # 'int'
-
-# Sair do escopo
-tabela_simbolos.exit_scope()
 
 def analisar_declaracoes(tokens):
     # Pilha inicial da análise sintática
