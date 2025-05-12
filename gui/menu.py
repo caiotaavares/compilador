@@ -38,11 +38,18 @@ def criar_menu(root, text_area, tree, text_log):
     menubar.add_cascade(label="Compiler", menu=menu_compiler)
 
     # Menu "Executar" - faz a análise e preenche a tabela
-    # Menu "Executar" - faz a análise e preenche a tabela
     menu_executar = tk.Menu(menubar, tearoff=False)
     menu_executar.add_command(
-        label="Executar Análise",
-        command=lambda: executar_analise(text_area, tree, text_log)
+        label="Executar",
+        command=lambda: executar_analise(text_area, tree, text_log, options="executar")
+    )
+    menu_executar.add_command(
+        label="Executar Análise Léxica",
+        command=lambda: executar_analise(text_area, tree, text_log, options="analise_lexica")
+    )
+    menu_executar.add_command(
+        label="Executar Análise Semântica",
+        command=lambda: executar_analise(text_area, tree, text_log, options="analise_semantica")
     )
     menubar.add_cascade(label="Executar", menu=menu_executar)
     

@@ -8,22 +8,22 @@ def analisar_expressao(expressao):
     tokens_encontrados = []
     linha = 1  # Começa na linha 1
 
-    # Verificação de comentário de bloco não fechado
-    aberturas = [m.start() for m in re.finditer(r'\{', expressao)]
-    fechamentos = [m.start() for m in re.finditer(r'\}', expressao)]
+    # # Verificação de comentário de bloco não fechado
+    # aberturas = [m.start() for m in re.finditer(r'\{', expressao)]
+    # fechamentos = [m.start() for m in re.finditer(r'\}', expressao)]
 
-    if len(aberturas) != len(fechamentos):
-        # Localiza a posição do erro (primeira abertura sem fechamento)
-        if len(aberturas) > len(fechamentos):
-            pos_erro = aberturas[len(fechamentos)]
-            linha_erro = expressao.count('\n', 0, pos_erro) + 1
-            raise SyntaxError(f"Erro: comentário de bloco '{{' iniciado na linha {linha_erro} não possui fechamento '}}'.")
-        else:
-            raise SyntaxError("Erro: comentário de bloco '}' sem abertura correspondente.")
+    # if len(aberturas) != len(fechamentos):
+    #     # Localiza a posição do erro (primeira abertura sem fechamento)
+    #     if len(aberturas) > len(fechamentos):
+    #         pos_erro = aberturas[len(fechamentos)]
+    #         linha_erro = expressao.count('\n', 0, pos_erro) + 1
+    #         raise SyntaxError(f"Erro: comentário de bloco '{{' iniciado na linha {linha_erro} não possui fechamento '}}'.")
+    #     else:
+    #         raise SyntaxError("Erro: comentário de bloco '}' sem abertura correspondente.")
 
-    # Limpeza dos comentários
-    expressao = re.sub(r'\{[^}]*\}', '', expressao, flags=re.DOTALL)  # Comentário de bloco
-    expressao = re.sub(r'//.*', '', expressao)  # Comentário de linha
+    # # Limpeza dos comentários
+    # expressao = re.sub(r'\{[^}]*\}', '', expressao, flags=re.DOTALL)  # Comentário de bloco
+    # expressao = re.sub(r'//.*', '', expressao)  # Comentário de linha
 
 
     # Tabela de palavras reservadas
@@ -75,8 +75,8 @@ def analisar_expressao(expressao):
         (r'/', lambda match: ('OPERADOR_DIVISAO', '/')),
         (r';', lambda match: ('PONTO_E_VIRGULA', ';')),
         (r',', lambda match: ('VIRGULA', ',')),
-        # (r'//.*', lambda match: ('COMENTARIO_LINHA', match.group(0))),  # Comentários de linha
-        # (r'{.*?}', lambda match: ('COMENTARIO_BLOCO', match.group(0))),  # Comentários de bloco
+        (r'//.*', lambda match: ('COMENTARIO_LINHA', match.group(0))),  # Comentários de linha
+        (r'{.*?}', lambda match: ('COMENTARIO_BLOCO', match.group(0))),  # Comentários de bloco
         (r'\s+', None),  # Ignora espaços em branco
     ]
 
