@@ -1,0 +1,12 @@
+program correto;
+int a, b, c;
+boolean d, e, f;
+
+procedure proc(var a1 : int);
+int a, b, c;
+boolean d, e, f;
+begin
+	a:=1;
+	if (a<1)
+		a:=12
+end;
