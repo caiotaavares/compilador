@@ -1,4 +1,4 @@
-[ ] - arrumar a lógica do comentário
+[X] - arrumar a lógica do comentário
 [ ] - cor no erro na tabela de lexema
 [ ] - limpar a interface quando abrir um código
 

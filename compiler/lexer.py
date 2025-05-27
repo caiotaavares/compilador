@@ -92,24 +92,33 @@ def analisar_expressao(expressao):
         match = None
         for regex, acao in regex_compiladas:
             match = regex.match(expressao, posicao)
-            print(match.group(0))
-            
-            # if match.group(0) == '{':
             
             if match:
                 if acao:
                     lexema = match.group(0)
+                    # Ignora comentários de bloco
+                    if lexema.startswith('{'):
+                        fechamento = expressao.find('}', posicao)
+                        if fechamento == -1:
+                            linha_erro = linha + expressao.count('\n', posicao)
+                            raise SyntaxError(f"Erro: comentário de bloco '{{' iniciado na linha {linha_erro} não possui fechamento '}}'.")
+                        # Atualiza a linha conforme o comentário
+                        linha += lexema.count('\n')
+                        posicao = fechamento + 1
+                        break  # Sai do for de regex, continua o while principal
+                    # Ignora comentários de linha
+                    if lexema.startswith('//'):
+                        linha += lexema.count('\n')
+                        posicao = match.end()
+                        break
                     col_ini = posicao + 1
                     col_fim = posicao + len(lexema)
                     token_type, valor = acao(match)
-                    # overflow
                     erro = ''
                     if token_type == 'NUMERO_INVALIDO':
                         erro = 'Número excede o limite permitido (int32).'
-                    # identificador
                     elif token_type == 'IDENTIFICADOR_INVALIDO':
                         erro = 'Identificador excede o tamanho máximo permitido (30 caracteres).'
-                
                     tokens_encontrados.append({
                         'lexema': lexema,
                         'token': token_type,

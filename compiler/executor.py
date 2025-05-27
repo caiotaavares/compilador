@@ -40,6 +40,7 @@ def executar_analise(text_area, tree, text_log, options):
     """
     # Obtém o texto da área principal
     expressao = text_area.get("1.0", tk.END).strip()
+    msg = ''
     
     try:
         if (options == "executar"):
