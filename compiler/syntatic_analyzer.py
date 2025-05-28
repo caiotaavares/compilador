@@ -25,13 +25,6 @@
 # Tabela sintática LL(1) para a linguagem LALG
 # dicionário em Python, onde a chave é o símbolo não terminal e o valor é outro dicionário
 tabela_sintatica = {
-    # Diz que se o topo da pilha for decl_var e o próximo token for var, então 
-    # deve expandir decl_var por essa produção.
-    # -->
-    # Chave externa = não-terminal.
-    # Chave interna = token da entrada.
-    # Valor = lista de símbolos da produção
-    # -->
     'programa': {
         'PALAVRA_RESERVADA_PROGRAM': [
             'PALAVRA_RESERVADA_PROGRAM', 'IDENTIFICADOR', 'PONTO_E_VIRGULA', 'decl_var', 'bloco_final'
@@ -53,9 +46,19 @@ tabela_sintatica = {
         'VIRGULA': ['VIRGULA', 'IDENTIFICADOR', 'lista_id_tail'],
         'PONTO_E_VIRGULA': ['ε']
     },
+    
+    # Estrutura básica (Bloco principal)
     'bloco_final': {
         'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END_PONTO']
     },
+    
+    # Chamada de procedimentos dentro do begin... end. principal
+    # program exemplo;
+    # ...
+    
+    # begin
+    #   <ESSA PARTE>
+    # end.
     'comandos': {
         'IDENTIFICADOR': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_READ': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
@@ -147,6 +150,8 @@ tabela_sintatica = {
         'ABRE_PARENTESES': ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES']
     }
 }
+
+print(tabela_sintatica)
 
 def analisar_declaracoes(tokens):
     pilha = ['$', 'programa']
