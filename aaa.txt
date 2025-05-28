@@ -13,9 +13,15 @@ begin
 	read(a);
 	write(b);
 	if (d)
-	begin
-		a:=+20;
-		b:=10*c;
-		c:=a div b
-	end
+		begin
+			a:=+20;
+			b:=10*c;
+			c:=a div b;
+		end
+	else
+		begin
+			a:=+20;
+			b:=10*c;
+			c:=a div b;
+		end
 end.

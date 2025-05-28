@@ -60,7 +60,7 @@ tabela_sintatica = {
         'IDENTIFICADOR': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_READ': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_WRITE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
-        'PALAVRA_RESERVADA_IF': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
+        'PALAVRA_RESERVADA_IF': ['comando','comandos'],
         'PALAVRA_RESERVADA_WHILE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_BEGIN': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_END': ['ε'],
@@ -91,7 +91,7 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_IF': [
             'PALAVRA_RESERVADA_IF',
             'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES',
-            'PALAVRA_RESERVADA_THEN',
+            # 'PALAVRA_RESERVADA_THEN',
             'comando',
             'cond_else'
         ]
@@ -99,7 +99,7 @@ tabela_sintatica = {
     'cond_else': {
         'PALAVRA_RESERVADA_ELSE': ['PALAVRA_RESERVADA_ELSE', 'comando'],
         'PALAVRA_RESERVADA_END': ['ε'],
-        'PONTO_E_VIRGULA': ['ε'],
+        # 'PONTO_E_VIRGULA': ['ε'],
         '$': ['ε']
     },
     'repeticao': {
@@ -131,7 +131,7 @@ tabela_sintatica = {
         'DIFERENTE': ['DIFERENTE', 'termo', 'expressao_tail'],
         'FECHA_PARENTESES': ['ε'],
         'PONTO_E_VIRGULA': ['ε'],
-        'PALAVRA_RESERVADA_THEN': ['ε'],
+        # 'PALAVRA_RESERVADA_THEN': ['ε'],
         'PALAVRA_RESERVADA_DO': ['ε'],
         'PALAVRA_RESERVADA_END': ['ε'],
         'PALAVRA_RESERVADA_ELSE': ['ε']
