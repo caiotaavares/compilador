@@ -10,15 +10,15 @@
 # lista_id_tail → , id lista_id_tail | ε
 # ------------------------------------------------------------------------------
 # ########## TABELA SINTÁTICA ##########
-# | Não-Terminal      | PALAVRA_RESERVADA_VAR           | IDENTIFICADOR                                         | PALAVRA_RESERVADA_INT   | PALAVRA_RESERVADA_BOOLEAN  | SEPARADOR (`:`)    | PONTO_E_VIRGULA (`;`)     | `$`                   |
+# | Não-Terminal      | PALAVRA_RESERVADA_VAR           | IDENTIFICADOR                                         | PALAVRA_RESERVADA_INT   | PALAVRA_RESERVADA_BOOLEAN  | SEPARADOR (:)    | PONTO_E_VIRGULA (;)     | $                   |
 # |-------------------|---------------------------------|-------------------------------------------------------|-------------------------|----------------------------|--------------------|---------------------------|-----------------------|
-# | **decl_var**      | decl_var → var lista_decl_var   | -                                                     | -                       | -                          | -                  | -                         | -                     |
-# | **lista_decl_var**| -                               | lista_decl_var → lista_id : tipo ; lista_decl_var     | -                       | -                          | -                  | -                         | lista_decl_var → ε    |
-# | **lista_id**      | -                               | lista_id → id lista_id_tail                           | -                       | -                          | -                  | -                         | -                     |
-# | **lista_id_tail** | -                               | -                                                     | -                       | -                          | lista_id_tail → ε  | -                         | -                     |
+# | *decl_var*      | decl_var → var lista_decl_var   | -                                                     | -                       | -                          | -                  | -                         | -                     |
+# | *lista_decl_var*| -                               | lista_decl_var → lista_id : tipo ; lista_decl_var     | -                       | -                          | -                  | -                         | lista_decl_var → ε    |
+# | *lista_id*      | -                               | lista_id → id lista_id_tail                           | -                       | -                          | -                  | -                         | -                     |
+# | *lista_id_tail* | -                               | -                                                     | -                       | -                          | lista_id_tail → ε  | -                         | -                     |
 # |                   | -                               | -                                                     | -                       | -                          | -                  | -                         | -                     |
 # |                   | -                               | lista_id_tail → , id lista_id_tail                    | -                       | -                          | -                  | -                         | -                     |
-# | **tipo**          | -                               | -                                                     | tipo → int              | tipo → boolean             | -                  | -                         | -                     |
+# | *tipo*          | -                               | -                                                     | tipo → int              | tipo → boolean             | -                  | -                         | -                     |
 
 # ------------------------------------------------------------------------------
 
