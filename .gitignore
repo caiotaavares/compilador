@@ -37,3 +37,7 @@ tkinter_cache/
 dist/
 build/
 *.egg-info/
+
+# ---- Arquivos específicos do projeto ----
+aaa.txt
+LALG.pdf
