@@ -22,20 +22,13 @@
 
 # ------------------------------------------------------------------------------
 
+print("\nCarregando analisador sintático...")
+
 # Tabela sintática LL(1) para a linguagem LALG
 # dicionário em Python, onde a chave é o símbolo não terminal e o valor é outro dicionário
 tabela_sintatica = {
-    # Diz que se o topo da pilha for decl_var e o próximo token for var, então 
-    # deve expandir decl_var por essa produção.
-    # -->
-    # Chave externa = não-terminal.
-    # Chave interna = token da entrada.
-    # Valor = lista de símbolos da produção
-    # -->
     'programa': {
-        'PALAVRA_RESERVADA_PROGRAM': [
-            'PALAVRA_RESERVADA_PROGRAM', 'IDENTIFICADOR', 'PONTO_E_VIRGULA', 'decl_var', 'bloco_final'
-        ]
+        'PALAVRA_RESERVADA_PROGRAM': ['PALAVRA_RESERVADA_PROGRAM', 'IDENTIFICADOR', 'PONTO_E_VIRGULA', 'decl_var', 'bloco_final']
     },
     'decl_var': {
         'PALAVRA_RESERVADA_INT': ['tipo', 'lista_id', 'PONTO_E_VIRGULA', 'decl_var'],
@@ -148,12 +141,19 @@ tabela_sintatica = {
     }
 }
 
+print(f"Tabela sintática carregada com {len(tabela_sintatica)} não-terminais")
+print(f"Não-terminais: {sorted(tabela_sintatica.keys())}")
+
 def analisar_declaracoes(tokens):
     pilha = ['$', 'programa']
     pos = 0
     tamanho = len(tokens)
     
-    print(tokens)
+    print("\nIniciando análise sintática...")
+    print(f"Tokens recebidos: {tokens}")
+    print(f"Pilha inicial: {pilha}")
+    print(f"Tabela sintática tem {len(tabela_sintatica)} não-terminais")
+    print(f"Não-terminais: {sorted(tabela_sintatica.keys())}")
 
     sync_tokens = {
         'decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
@@ -195,54 +195,73 @@ def analisar_declaracoes(tokens):
 
     while pilha:
         topo = pilha.pop()
-
         atual = token_atual()
 
+        print(f"\nTopo da pilha: {topo}")
+        print(f"Token atual: {atual}")
+        print(f"Pilha: {pilha}")
+
         if topo == 'ε':
+            print("Topo é epsilon, continuando...")
             continue
 
         if topo == atual:
+            print(f"Topo igual ao token atual ({topo}), consumindo token...")
             pos += 1
 
             # Se passou do fim, para o loop
             if pos > tamanho:
+                print("Fim dos tokens, parando...")
                 break
 
         elif topo in tabela_sintatica:
+            print(f"Topo é não-terminal ({topo}), buscando produção para token {atual}...")
             producao = tabela_sintatica[topo].get(atual)
 
             if producao:
+                print(f"Produção encontrada: {producao}")
                 for simbolo in reversed(producao):
                     if simbolo != 'ε':
                         pilha.append(simbolo)
+                print(f"Nova pilha: {pilha}")
             else:
-                erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Tentando recuperação...")
+                erro = f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Tentando recuperação..."
+                print(erro)
+                erros.append(erro)
 
                 sync_set = sync_tokens.get(topo, ['$'])
+                print(f"Conjunto de sincronização para {topo}: {sync_set}")
                 # Enquanto token atual não for sincronizador e não fim da entrada
                 while atual not in sync_set and atual != '$':
                     pos += 1
                     atual = token_atual()
                 # Se chegou no fim, sai do loop
                 if atual == '$':
+                    print("Fim dos tokens durante recuperação, parando...")
                     break
 
+                print(f"Sincronizado com token {atual}")
                 # Não empilha nada para tentar continuar após sincronizar
 
         else:
             # topo é terminal mas diferente do atual (erro)
-            erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Esperava '{topo}'. Tentando sincronizar...")
+            erro = f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Esperava '{topo}'. Tentando sincronizar..."
+            print(erro)
+            erros.append(erro)
 
             # Descarta token atual para tentar sincronizar
             pos += 1
 
             # Se passou do fim, para o loop
             if pos > tamanho:
+                print("Fim dos tokens durante recuperação, parando...")
                 break
 
+            print("Token descartado, continuando...")
             # Não empilha nada, tenta continuar
 
     if erros:
         raise SyntaxError('\n'.join(erros))
 
+    print("Análise sintática concluída com sucesso!")
     return True
