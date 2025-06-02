@@ -24,6 +24,7 @@
 
 # Tabela sintática LL(1) para a linguagem LALG
 # dicionário em Python, onde a chave é o símbolo não terminal e o valor é outro dicionário
+
 tabela_sintatica = {
     'programa': {
         'PALAVRA_RESERVADA_PROGRAM': [
@@ -46,24 +47,21 @@ tabela_sintatica = {
         'VIRGULA': ['VIRGULA', 'IDENTIFICADOR', 'lista_id_tail'],
         'PONTO_E_VIRGULA': ['ε']
     },
-    
-    # Estrutura básica (Bloco principal)
     'bloco_final': {
         'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END_PONTO']
     },
-    
-    # Chamada de procedimentos dentro do begin... end. principal
-    # program exemplo;
-    # ...
-    
-    # begin
-    #   <ESSA PARTE>
-    # end.
+    'bloco': {
+        # 'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END', 'PONTO_E_VIRGULA']
+        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END_PONTO_E_VIRGULA']
+    },
+    'bloco_if': {
+        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END']
+    },
     'comandos': {
         'IDENTIFICADOR': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_READ': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_WRITE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
-        'PALAVRA_RESERVADA_IF': ['comando','comandos'],
+        'PALAVRA_RESERVADA_IF': ['comando', 'comandos'],
         'PALAVRA_RESERVADA_WHILE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_BEGIN': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_END': ['ε'],
@@ -92,24 +90,28 @@ tabela_sintatica = {
     },
     'condicional': {
         'PALAVRA_RESERVADA_IF': [
-            'PALAVRA_RESERVADA_IF',
-            'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES',
-            # 'PALAVRA_RESERVADA_THEN',
-            'comando',
-            'cond_else'
+            'PALAVRA_RESERVADA_IF', 'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES',
+            'PALAVRA_RESERVADA_THEN', 'comando_then', 'cond_else'
         ]
+    },
+    'comando_then': {
+        'PALAVRA_RESERVADA_BEGIN': ['bloco_if'],
+        'IDENTIFICADOR': ['comando'],
+        'PALAVRA_RESERVADA_READ': ['comando'],
+        'PALAVRA_RESERVADA_WRITE': ['comando'],
+        'PALAVRA_RESERVADA_IF': ['condicional'],
+        'PALAVRA_RESERVADA_WHILE': ['comando']
     },
     'cond_else': {
         'PALAVRA_RESERVADA_ELSE': ['PALAVRA_RESERVADA_ELSE', 'comando'],
         'PALAVRA_RESERVADA_END': ['ε'],
-        # 'PONTO_E_VIRGULA': ['ε'],
+        'PONTO_E_VIRGULA': ['ε'],
         '$': ['ε']
     },
     'repeticao': {
-        'PALAVRA_RESERVADA_WHILE': ['PALAVRA_RESERVADA_WHILE', 'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES', 'comando']
-    },
-    'bloco': {
-        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END']
+        'PALAVRA_RESERVADA_WHILE': [
+            'PALAVRA_RESERVADA_WHILE', 'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES', 'comando'
+        ]
     },
     'expressao': {
         'IDENTIFICADOR': ['termo', 'expressao_tail'],
@@ -134,7 +136,7 @@ tabela_sintatica = {
         'DIFERENTE': ['DIFERENTE', 'termo', 'expressao_tail'],
         'FECHA_PARENTESES': ['ε'],
         'PONTO_E_VIRGULA': ['ε'],
-        # 'PALAVRA_RESERVADA_THEN': ['ε'],
+        'PALAVRA_RESERVADA_THEN': ['ε'],
         'PALAVRA_RESERVADA_DO': ['ε'],
         'PALAVRA_RESERVADA_END': ['ε'],
         'PALAVRA_RESERVADA_ELSE': ['ε']
