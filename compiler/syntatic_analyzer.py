@@ -48,45 +48,25 @@ tabela_sintatica = {
         'PONTO_E_VIRGULA': ['ε']
     },
     'bloco_final': {
-        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END_PONTO']
+        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END','PONTO']
     },
-    'bloco': {
-        # 'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END', 'PONTO_E_VIRGULA']
-        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END_PONTO_E_VIRGULA']
-    },
-    'bloco_if': {
-        'PALAVRA_RESERVADA_BEGIN': ['PALAVRA_RESERVADA_BEGIN', 'comandos', 'PALAVRA_RESERVADA_END']
-    },
+    
     'comandos': {
-        'IDENTIFICADOR': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
+        # 'IDENTIFICADOR': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_READ': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_WRITE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_IF': ['comando', 'comandos'],
         'PALAVRA_RESERVADA_WHILE': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_BEGIN': ['comando', 'PONTO_E_VIRGULA', 'comandos'],
         'PALAVRA_RESERVADA_END': ['ε'],
-        'PALAVRA_RESERVADA_END_PONTO': ['ε']
     },
     'comando': {
-        'IDENTIFICADOR': ['atribuicao_ou_chamada'],
-        'PALAVRA_RESERVADA_READ': ['leitura'],
-        'PALAVRA_RESERVADA_WRITE': ['escrita'],
+        # 'IDENTIFICADOR': ['atribuicao_ou_chamada'],
+        # 'PALAVRA_RESERVADA_READ': ['leitura'],
+        # 'PALAVRA_RESERVADA_WRITE': ['escrita'],
         'PALAVRA_RESERVADA_IF': ['condicional'],
-        'PALAVRA_RESERVADA_WHILE': ['repeticao'],
-        'PALAVRA_RESERVADA_BEGIN': ['bloco']
-    },
-    'atribuicao_ou_chamada': {
-        'IDENTIFICADOR': ['IDENTIFICADOR', 'atribuicao_ou_chamada_tail']
-    },
-    'atribuicao_ou_chamada_tail': {
-        'ATRIBUICAO': ['ATRIBUICAO', 'expressao'],
-        'ABRE_PARENTESES': ['ABRE_PARENTESES', 'IDENTIFICADOR', 'FECHA_PARENTESES']
-    },
-    'leitura': {
-        'PALAVRA_RESERVADA_READ': ['PALAVRA_RESERVADA_READ', 'ABRE_PARENTESES', 'IDENTIFICADOR', 'FECHA_PARENTESES']
-    },
-    'escrita': {
-        'PALAVRA_RESERVADA_WRITE': ['PALAVRA_RESERVADA_WRITE', 'ABRE_PARENTESES', 'IDENTIFICADOR', 'FECHA_PARENTESES']
+        # 'PALAVRA_RESERVADA_WHILE': ['repeticao'],
+        # 'PALAVRA_RESERVADA_BEGIN': ['bloco']
     },
     'condicional': {
         'PALAVRA_RESERVADA_IF': [
@@ -94,25 +74,7 @@ tabela_sintatica = {
             'PALAVRA_RESERVADA_THEN', 'comando_then', 'cond_else'
         ]
     },
-    'comando_then': {
-        'PALAVRA_RESERVADA_BEGIN': ['bloco_if'],
-        'IDENTIFICADOR': ['comando'],
-        'PALAVRA_RESERVADA_READ': ['comando'],
-        'PALAVRA_RESERVADA_WRITE': ['comando'],
-        'PALAVRA_RESERVADA_IF': ['condicional'],
-        'PALAVRA_RESERVADA_WHILE': ['comando']
-    },
-    'cond_else': {
-        'PALAVRA_RESERVADA_ELSE': ['PALAVRA_RESERVADA_ELSE', 'comando'],
-        'PALAVRA_RESERVADA_END': ['ε'],
-        'PONTO_E_VIRGULA': ['ε'],
-        '$': ['ε']
-    },
-    'repeticao': {
-        'PALAVRA_RESERVADA_WHILE': [
-            'PALAVRA_RESERVADA_WHILE', 'ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES', 'comando'
-        ]
-    },
+    # TERMINEI NA PORRA DO COMANDO THEN
     'expressao': {
         'IDENTIFICADOR': ['termo', 'expressao_tail'],
         'NUMERO_INTEIRO': ['termo', 'expressao_tail'],
@@ -163,24 +125,24 @@ def analisar_declaracoes(tokens):
     print(tokens)
 
     sync_tokens = {
-        'decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        'lista_decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        'tipo': ['SEPARADOR', 'PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', '$'],
-        'lista_id': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        'lista_id_tail': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
+        # 'decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
+        # 'lista_decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
+        # 'tipo': ['SEPARADOR', 'PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', '$'],
+        # 'lista_id': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
+        # 'lista_id_tail': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
     }
     
-    sync_tokens.update({
-        'atribuicao': ['PONTO_E_VIRGULA'],
-        'expressao': ['PONTO_E_VIRGULA', 'FECHA_PARENTESES'],
-        'comando': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
-        'condicional': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
-    })
+    # sync_tokens.update({
+    #     'atribuicao': ['PONTO_E_VIRGULA'],
+    #     'expressao': ['PONTO_E_VIRGULA', 'FECHA_PARENTESES'],
+    #     'comando': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
+    #     'condicional': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
+    # })
     
-    sync_tokens.update({
-        'bloco_programa': ['PONTO'],
-        'bloco_procedure': ['PONTO_E_VIRGULA'],
-    })
+    # sync_tokens.update({
+    #     'bloco_programa': ['PONTO'],
+    #     'bloco_procedure': ['PONTO_E_VIRGULA'],
+    # })
 
     erros = []
 

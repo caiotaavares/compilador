@@ -33,11 +33,8 @@ def analisar_expressao(expressao):
     # Definição das expressões regulares
     regex_tokens = [
         (r'\b(program|begin|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\b', lambda match: ('PALAVRA_RESERVADA_' + match.group(0).upper(), match.group(0))),
-        (r'\bend\.', lambda match: ('PALAVRA_RESERVADA_END_PONTO', 'end.')),
-        (r'\bend;', lambda match: ('PALAVRA_RESERVADA_END_PONTO_E_VIRGULA', 'end;')),
         (r'\bend\b', lambda match: ('PALAVRA_RESERVADA_END', 'end')),
-        (r'\.', lambda match: ('PONTO', '.')),  # Ponto isolado
-        (r'\bend\b', lambda match: ('PALAVRA_RESERVADA_END', match.group(0))),
+        (r'\.', lambda match: ('PONTO', '.')),
         (r'\bdiv\b', lambda match: ('OPERADOR_DIV', 'div')),
         (r'[a-zA-Z_][a-zA-Z0-9_]*', lambda match: validar_identificador(match)),
         (r'\d+(\.\d+)?', lambda match: validar_numero(match)),
