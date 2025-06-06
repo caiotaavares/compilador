@@ -1,27 +1,3 @@
-# from compiler.symbol_table import SymbolTable
-
-# ------------------------------------------------------------------------------
-# ANALISADOR SINTÁTICO
-# ------------------------------------------------------------------------------
-# decl_var → var lista_decl_var
-# lista_decl_var → tipo : lista_id ; lista_decl_var | ε
-# tipo → int | boolean
-# lista_id → id lista_id_tail
-# lista_id_tail → , id lista_id_tail | ε
-# ------------------------------------------------------------------------------
-# ########## TABELA SINTÁTICA ##########
-# | Não-Terminal      | PALAVRA_RESERVADA_VAR           | IDENTIFICADOR                                         | PALAVRA_RESERVADA_INT   | PALAVRA_RESERVADA_BOOLEAN  | SEPARADOR (:)    | PONTO_E_VIRGULA (;)     | $                   |
-# |-------------------|---------------------------------|-------------------------------------------------------|-------------------------|----------------------------|--------------------|---------------------------|-----------------------|
-# | *decl_var*      | decl_var → var lista_decl_var   | -                                                     | -                       | -                          | -                  | -                         | -                     |
-# | *lista_decl_var*| -                               | lista_decl_var → lista_id : tipo ; lista_decl_var     | -                       | -                          | -                  | -                         | lista_decl_var → ε    |
-# | *lista_id*      | -                               | lista_id → id lista_id_tail                           | -                       | -                          | -                  | -                         | -                     |
-# | *lista_id_tail* | -                               | -                                                     | -                       | -                          | lista_id_tail → ε  | -                         | -                     |
-# |                   | -                               | -                                                     | -                       | -                          | -                  | -                         | -                     |
-# |                   | -                               | lista_id_tail → , id lista_id_tail                    | -                       | -                          | -                  | -                         | -                     |
-# | *tipo*          | -                               | -                                                     | tipo → int              | tipo → boolean             | -                  | -                         | -                     |
-
-# ------------------------------------------------------------------------------
-
 # Tabela sintática LL(1) para a linguagem LALG
 # dicionário em Python, onde a chave é o símbolo não terminal e o valor é outro dicionário
 
@@ -181,9 +157,6 @@ tabela_sintatica = {
             'PALAVRA_RESERVADA_WHILE', 'expressao', 'PALAVRA_RESERVADA_DO', 'comando'
         ]
     },
-}
-
-tabela_sintatica.update({
     # 16. <expressao> ::= expressao_simples expressao_relacional_tail
     'expressao': {
         'IDENTIFICADOR': ['expressao_simples', 'expressao_relacional_tail'],
@@ -383,10 +356,7 @@ tabela_sintatica.update({
         'NUMERO_INTEIRO': ['NUMERO_INTEIRO'],
         'NUMERO_REAL': ['NUMERO_REAL'],
     }
-})
-
-
-print(tabela_sintatica)
+}
 
 def analisar_declaracoes(tokens):
     pilha = ['$', 'programa']
@@ -395,25 +365,7 @@ def analisar_declaracoes(tokens):
     
     print(tokens)
 
-    sync_tokens = {
-        # 'decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        # 'lista_decl_var': ['PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        # 'tipo': ['SEPARADOR', 'PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', '$'],
-        # 'lista_id': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-        # 'lista_id_tail': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_BEGIN', 'PALAVRA_RESERVADA_PROCEDURE', '$'],
-    }
-    
-    # sync_tokens.update({
-    #     'atribuicao': ['PONTO_E_VIRGULA'],
-    #     'expressao': ['PONTO_E_VIRGULA', 'FECHA_PARENTESES'],
-    #     'comando': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
-    #     'condicional': ['PONTO_E_VIRGULA', 'PALAVRA_RESERVADA_END', 'PALAVRA_RESERVADA_IF', 'IDENTIFICADOR'],
-    # })
-    
-    # sync_tokens.update({
-    #     'bloco_programa': ['PONTO'],
-    #     'bloco_procedure': ['PONTO_E_VIRGULA'],
-    # })
+    sync_tokens = {}
 
     erros = []
 
@@ -488,3 +440,17 @@ def analisar_declaracoes(tokens):
         raise SyntaxError('\n'.join(erros))
 
     return True
+
+from lark import Lark
+
+def analisar_pascal_lark(codigo_fonte, caminho_gramatica="grammar.lark"):
+    # Lê a gramática do arquivo
+    with open(caminho_gramatica, "r", encoding="utf-8") as f:
+        gramatica = f.read()
+
+    # Cria o parser do Lark
+    parser = Lark(gramatica, start="start", parser="lalr")
+    # Faz o parse do código-fonte
+    arvore = parser.parse(codigo_fonte)
+    
+    return arvore

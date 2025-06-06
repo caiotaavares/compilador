@@ -1,0 +1,118 @@
+// ============================
+// 1. Definição dos Tokens
+// ============================
+PALAVRA_RESERVADA_PROGRAM: "program"
+PALAVRA_RESERVADA_BEGIN: "begin"
+PALAVRA_RESERVADA_END: "end"
+PALAVRA_RESERVADA_IF: "if"
+PALAVRA_RESERVADA_THEN: "then"
+PALAVRA_RESERVADA_ELSE: "else"
+PALAVRA_RESERVADA_WHILE: "while"
+PALAVRA_RESERVADA_DO: "do"
+PALAVRA_RESERVADA_PROCEDURE: "procedure"
+PALAVRA_RESERVADA_VAR: "var"
+PALAVRA_RESERVADA_INT: "int"
+PALAVRA_RESERVADA_BOOLEAN: "boolean"
+PALAVRA_RESERVADA_TRUE: "true"
+PALAVRA_RESERVADA_FALSE: "false"
+PALAVRA_RESERVADA_READ: "read"
+PALAVRA_RESERVADA_WRITE: "write"
+
+PONTO: "."
+OPERADOR_DIV: "div"
+ATRIBUICAO: ":="
+SEPARADOR: ":"
+IGUALDADE: "=="
+DIFERENTE: "<>"
+MENOR_IGUAL: "<="
+MAIOR_IGUAL: ">="
+MENOR: "<"
+MAIOR: ">"
+ABRE_PARENTESES: "("
+FECHA_PARENTESES: ")"
+ABRE_CHAVES: "{"
+FECHA_CHAVES: "}"
+ABRE_COLCHETES: "["
+FECHA_COLCHETES: "]"
+OPERADOR_SOMA: "+"
+OPERADOR_SUBTRACAO: "-"
+OPERADOR_MULTIPLICACAO: "*"
+PONTO_E_VIRGULA: ";"
+VIRGULA: ","
+
+// Comentários e ignorados
+COMENTARIO_LINHA: /\/\/.*/
+COMENTARIO_BLOCO: /\{.*?\}/s
+%ignore COMENTARIO_LINHA
+%ignore COMENTARIO_BLOCO
+%ignore /[ \t\r\n\f]+/
+
+IDENTIFICADOR: /[a-zA-Z_][a-zA-Z0-9_]*/
+NUMERO_INTEIRO: /\d+/
+NUMERO_REAL: /\d+\.\d+/
+
+// ============================
+// 2. Regras Sintáticas
+// ============================
+start: programa
+
+programa: PALAVRA_RESERVADA_PROGRAM IDENTIFICADOR PONTO_E_VIRGULA bloco PONTO
+
+bloco: partedeclaracaovariavel partedeclaracaosubrotina comandocomposto
+
+partedeclaracaovariavel: (declaracaovariavel PONTO_E_VIRGULA)*
+partedeclaracaosubrotina: (declaracaoprocedimento PONTO_E_VIRGULA)*
+
+declaracaovariavel: tipo listaidentificadores
+
+listaidentificadores: IDENTIFICADOR listaidentificadores1
+listaidentificadores1: (VIRGULA IDENTIFICADOR listaidentificadores1)?
+
+tipo: PALAVRA_RESERVADA_BOOLEAN | PALAVRA_RESERVADA_INT
+
+declaracaoprocedimento: PALAVRA_RESERVADA_PROCEDURE IDENTIFICADOR declaracaoprocedimento1 PONTO_E_VIRGULA bloco
+declaracaoprocedimento1: parametrosformais?
+
+parametrosformais: ABRE_PARENTESES secaoparametrosformais parametrosformais1 FECHA_PARENTESES
+parametrosformais1: (PONTO_E_VIRGULA secaoparametrosformais parametrosformais1)?
+secaoparametrosformais: PALAVRA_RESERVADA_VAR? listaidentificadores SEPARADOR (IDENTIFICADOR | tipo)
+
+comandocomposto: PALAVRA_RESERVADA_BEGIN comando comandocomposto1 PALAVRA_RESERVADA_END
+comandocomposto1: (PONTO_E_VIRGULA comando comandocomposto1)?
+
+comando: atribuicao
+       | chamadaprocedimento
+       | comandocomposto
+       | comandocondicional
+       | comandorepetitivo1
+
+atribuicao: variavel ATRIBUICAO expressao
+
+variavel: IDENTIFICADOR variavel1
+variavel1: (ABRE_COLCHETES expressao FECHA_COLCHETES)?
+
+chamadaprocedimento: (IDENTIFICADOR | PALAVRA_RESERVADA_READ | PALAVRA_RESERVADA_WRITE) chamadaprocedimento1
+chamadaprocedimento1: (ABRE_PARENTESES listaexpressao FECHA_PARENTESES)?
+listaexpressao: expressao listaexpressao1
+listaexpressao1: (VIRGULA expressao listaexpressao1)?
+
+comandocondicional: PALAVRA_RESERVADA_IF expressao PALAVRA_RESERVADA_THEN comando comandocondicional1
+comandocondicional1: (PALAVRA_RESERVADA_ELSE comando)?
+
+comandorepetitivo1: PALAVRA_RESERVADA_WHILE expressao PALAVRA_RESERVADA_DO comando
+
+expressao: expressaosimples expressao1
+expressao1: (relacao expressaosimples)?
+relacao: IGUALDADE | DIFERENTE | MENOR | MENOR_IGUAL | MAIOR_IGUAL | MAIOR
+
+expressaosimples: (OPERADOR_SOMA | OPERADOR_SUBTRACAO)? termo expressaosimples1
+expressaosimples1: ((OPERADOR_SOMA | OPERADOR_SUBTRACAO ) termo expressaosimples1)?
+termo: fator termo1
+termo1: ((OPERADOR_MULTIPLICACAO | OPERADOR_DIV) fator termo1)?
+fator: variavel
+     | numero
+     | ABRE_PARENTESES expressao FECHA_PARENTESES
+     | PALAVRA_RESERVADA_TRUE
+     | PALAVRA_RESERVADA_FALSE
+
+numero: NUMERO_INTEIRO | NUMERO_REAL

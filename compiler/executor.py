@@ -1,5 +1,6 @@
 from compiler.lexer import analisar_expressao
 from compiler.syntatic_analyzer import analisar_declaracoes
+from compiler.syntatic_analyzer import analisar_pascal_lark
 
 import tkinter as tk
 
@@ -38,6 +39,7 @@ def executar_analise(text_area, tree, text_log, options):
     Lê o texto da área principal, analisa e exibe o resultado na Tabela de Lexemas.
     Também atualiza o Log de Compilação com mensagens de sucesso ou erro.
     """
+    tokens = []   # <-- inicialize aqui
     # Obtém o texto da área principal
     expressao = text_area.get("1.0", tk.END).strip()
     msg = ''
@@ -54,15 +56,19 @@ def executar_analise(text_area, tree, text_log, options):
             msg = "Análise léxica..."
             
         elif (options == "analise_semantica"):
-            # Executa apenas a análise semântica
-            analisar_declaracoes(tokens)
-            msg = "Análise semântica..."
+            try:
+                arvore = analisar_pascal_lark(expressao)  # onde expressao é o código Pascal do editor
+                print(arvore.pretty())  # ou mostre a árvore na interface
+                msg = "Análise sintática com Lark concluída com sucesso!"
+            except Exception as e:
+                print("Erro de análise sintática:", e)
             
     except SyntaxError as e:
         text_log.config(state='normal')
         text_log.delete('1.0', tk.END)
         text_log.insert('1.0', f"Erro de compilação: {e}")
         text_log.config(foreground='red', state='disabled')
+        popular_tabela_lexemas(tree, tokens)   # <- Garante que sempre vai ser chamado sem erro
         return
 
     
