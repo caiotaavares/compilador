@@ -6,10 +6,11 @@ import tkinter as tk
 # ------------------------------------------------------------------------------
 def criar_area_principal(root):
     """Cria a área principal (como um editor de texto) e a posiciona na janela."""
-     # Frame para conter o contador e o texto
+    # Frame para conter o contador e o texto
     frame_texto = ttk.Frame(root)
     frame_texto.grid(row=0, column=0, sticky="nsew")
-    frame_texto.columnconfigure(1, weight=1)
+    frame_texto.grid_rowconfigure(0, weight=1)  # Aumenta o peso da área de texto
+    frame_texto.grid_columnconfigure(1, weight=1)  # Aumenta o peso da coluna do texto
     
     # Widget do contador de linhas (Text com fundo cinza)
     text_line_numbers = tk.Text(
@@ -23,9 +24,22 @@ def criar_area_principal(root):
     )
     text_line_numbers.grid(row=0, column=0, sticky="ns")
     
-    # Área principal de texto
-    text_area = tk.Text(frame_texto)
+    # Área principal de texto com scrollbar horizontal
+    text_area = tk.Text(frame_texto, wrap="none", height=35)  # Aumentando para 35 linhas
     text_area.grid(row=0, column=1, sticky="nsew")
+    
+    # Scrollbars vertical e horizontal
+    vsb = ttk.Scrollbar(frame_texto, orient="vertical")
+    hsb = ttk.Scrollbar(frame_texto, orient="horizontal")
+    
+    # Configura os scrollbars
+    vsb.config(command=text_area.yview)
+    hsb.config(command=text_area.xview)
+    text_area.config(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+    
+    # Posiciona os scrollbars
+    vsb.grid(row=0, column=2, sticky="ns")
+    hsb.grid(row=1, column=1, sticky="ew")
     
     # Função para atualizar os números de linha
     def update_line_numbers(event=None):
@@ -49,28 +63,32 @@ def criar_area_principal(root):
         text_line_numbers.yview_moveto(text_area.yview()[0])
     
     # Sincroniza a rolagem vertical
-    def on_scroll(*args):
-        if len(args) > 1:
-            # Movimento do scrollbar
-            text_area.yview_moveto(args[0])
-            text_line_numbers.yview_moveto(args[0])
-        else:
-            # Movimento do mouse wheel
-            text_area.yview_scroll(args[0], "units")
-            text_line_numbers.yview_scroll(args[0], "units")
+    def on_vertical_scroll(*args):
+        text_area.yview(*args)
+        text_line_numbers.yview(*args)
         update_line_numbers()
     
-    vsb = ttk.Scrollbar(frame_texto, orient="vertical", command=on_scroll)
-    text_area.config(yscrollcommand=vsb.set)
-    text_line_numbers.config(yscrollcommand=vsb.set)
-    vsb.grid(row=0, column=2, sticky="ns")
+    # Configura o scrollbar vertical para usar a nova função
+    vsb.config(command=on_vertical_scroll)
     
     # Vincula eventos que modificam o texto ou a visualização
     text_area.bind('<<Modified>>', update_line_numbers)
     text_area.bind('<Configure>', update_line_numbers)
-    text_area.bind('<MouseWheel>', lambda e: on_scroll(-1 if e.delta > 0 else 1))
-    text_area.bind('<Button-4>', lambda e: on_scroll(-1))  # Linux scroll up
-    text_area.bind('<Button-5>', lambda e: on_scroll(1))   # Linux scroll down
+    
+    # Suporte a rolagem do mouse
+    def on_mousewheel(event):
+        if event.state == 0:  # Sem modificadores (rolagem vertical)
+            text_area.yview_scroll(int(-1 * (event.delta/120)), "units")
+        elif event.state == 1:  # Shift pressionado (rolagem horizontal)
+            text_area.xview_scroll(int(-1 * (event.delta/120)), "units")
+        return "break"
+    
+    # Vincula eventos de rolagem do mouse
+    text_area.bind('<MouseWheel>', on_mousewheel)  # Windows
+    text_area.bind('<Button-4>', lambda e: text_area.yview_scroll(-1, "units"))  # Linux scroll up
+    text_area.bind('<Button-5>', lambda e: text_area.yview_scroll(1, "units"))   # Linux scroll down
+    text_area.bind('<Shift-Button-4>', lambda e: text_area.xview_scroll(-1, "units"))  # Linux horizontal scroll
+    text_area.bind('<Shift-Button-5>', lambda e: text_area.xview_scroll(1, "units"))   # Linux horizontal scroll
     
     # Atualiza inicialmente
     update_line_numbers()

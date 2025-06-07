@@ -6,14 +6,16 @@ import tkinter as tk
 # ------------------------------------------------------------------------------
 # 4. Criação do Menu
 # ------------------------------------------------------------------------------
-def criar_menu(root, text_area, tree, text_log):
+def criar_menu(root, text_area, tree, text_log, tree_sintatica):
     """Cria a barra de menu e adiciona ao root."""
+    print("\nCriando menu...")
+    
     menubar = tk.Menu(root)
 
     # Menu "Arquivo"
     menu_arquivo = tk.Menu(menubar, tearoff=False)
     menu_arquivo.add_command(label="Novo")
-    menu_arquivo.add_command(label="Abrir", command=lambda: abrir_arquivo(text_area))
+    menu_arquivo.add_command(label="Abrir", command=lambda: abrir_arquivo(text_area, tree, text_log, tree_sintatica))
     menu_arquivo.add_command(label="Salvar")
     menu_arquivo.add_separator()
     menu_arquivo.add_command(label="Sair", command=root.quit)
@@ -41,15 +43,15 @@ def criar_menu(root, text_area, tree, text_log):
     menu_executar = tk.Menu(menubar, tearoff=False)
     menu_executar.add_command(
         label="Executar",
-        command=lambda: executar_analise(text_area, tree, text_log, options="executar")
+        command=lambda: executar_analise(text_area, tree, text_log, options="executar", tree_sintatica=tree_sintatica)
     )
     menu_executar.add_command(
         label="Executar Análise Léxica",
-        command=lambda: executar_analise(text_area, tree, text_log, options="analise_lexica")
+        command=lambda: executar_analise(text_area, tree, text_log, options="analise_lexica", tree_sintatica=tree_sintatica)
     )
     menu_executar.add_command(
         label="Executar Análise Semântica",
-        command=lambda: executar_analise(text_area, tree, text_log, options="analise_semantica")
+        command=lambda: executar_analise(text_area, tree, text_log, options="analise_semantica", tree_sintatica=tree_sintatica)
     )
     menubar.add_cascade(label="Executar", menu=menu_executar)
     
@@ -64,16 +66,37 @@ def criar_menu(root, text_area, tree, text_log):
 # ------------------------------------------------------------------------------
 # 5. Abertura de Arquivo (para carregar texto no editor)
 # ------------------------------------------------------------------------------
-def abrir_arquivo(text_area):
+def abrir_arquivo(text_area, tree, text_log, tree_sintatica):
     """Abre um arquivo de texto e carrega o conteúdo na área de texto."""
     file_path = filedialog.askopenfilename(
         filetypes=[("Arquivos de texto", "*.txt"), ("Todos os arquivos", "*.*")]
     )
     if file_path:
         try:
+            # Limpa a área de texto
+            text_area.delete("1.0", tk.END)
+            
+            # Habilita, limpa e desabilita o log
+            text_log.config(state='normal')
+            text_log.delete("1.0", tk.END)
+            text_log.config(state='disabled')
+            
+            # Limpa apenas a tabela de lexemas
+            for item in tree.get_children():
+                tree.delete(item)
+            
+            # Carrega o novo arquivo
             with open(file_path, 'r', encoding='utf-8') as f:
                 conteudo = f.read()
-            text_area.delete("1.0", tk.END)
             text_area.insert("1.0", conteudo)
+            
+            # Atualiza o log
+            text_log.config(state='normal')
+            text_log.insert("1.0", f"Arquivo carregado com sucesso: {file_path}\n")
+            text_log.config(state='disabled', foreground='green')
+            
         except Exception as e:
-            print(f"Erro ao ler o arquivo: {e}")
+            text_log.config(state='normal')
+            text_log.delete("1.0", tk.END)
+            text_log.insert("1.0", f"Erro ao ler o arquivo: {e}\n")
+            text_log.config(state='disabled', foreground='red')
