@@ -441,16 +441,4 @@ def analisar_declaracoes(tokens):
 
     return True
 
-from lark import Lark
 
-def analisar_pascal_lark(codigo_fonte, caminho_gramatica="grammar.lark"):
-    # Lê a gramática do arquivo
-    with open(caminho_gramatica, "r", encoding="utf-8") as f:
-        gramatica = f.read()
-
-    # Cria o parser do Lark
-    parser = Lark(gramatica, start="start", parser="lalr")
-    # Faz o parse do código-fonte
-    arvore = parser.parse(codigo_fonte)
-    
-    return arvore

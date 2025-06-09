@@ -1,5 +1,4 @@
-from compiler.syntatic_analyzer import tabela_sintatica
-
+from compiler.syntatic import tabela_sintatica
 from gui.window import criar_janela_principal
 from gui.editor import criar_area_principal
 from gui.notebook import criar_bloco_inferior

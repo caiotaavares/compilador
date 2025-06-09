@@ -1,5 +1,5 @@
-from compiler.lexer import analisar_expressao
 from compiler.syntatic_analyzer import tabela_sintatica
+from lark import Lark, UnexpectedInput
 from datetime import datetime
 import tkinter as tk
 from lark import Lark
@@ -8,20 +8,6 @@ from lark import Lark
 def get_timestamp():
     """Retorna um timestamp formatado para o log."""
     return datetime.now().strftime("[%H:%M:%S] ")
-
-# Função de análise sintática com Lark
-def analisar_pascal_lark(codigo_fonte, caminho_gramatica="grammar.lark"):
-    # Lê a gramática do arquivo
-    with open(caminho_gramatica, "r", encoding="utf-8") as f:
-        gramatica = f.read()
-
-    # Cria o parser do Lark
-    parser = Lark(gramatica, start="start", parser="lalr")
-    
-    # Faz o parse do código-fonte
-    arvore = parser.parse(codigo_fonte)
-    
-    return arvore
 
 # Função para popular a tabela de lexemas
 def popular_tabela_lexemas(tree, tokens):
@@ -35,14 +21,7 @@ def popular_tabela_lexemas(tree, tokens):
                     tags=tags)
 
 # Função para popular a tabela sintática
-def popular_tabela_sintatica(tree_sintatica):
-    try:
-        # Tenta importar localmente se não for global
-        from compiler.syntatic_analyzer import tabela_sintatica
-    except ImportError:
-        print("ERRO CRÍTICO: Não foi possível encontrar 'tabela_sintatica'. Verifique a importação em executor.py")
-        return
-    
+def popular_tabela_sintatica(tree_sintatica):    
     try:
         for item in tree_sintatica.get_children():
             tree_sintatica.delete(item)
@@ -88,13 +67,21 @@ def executar_analise(text_area, tree, text_log, options, tree_sintatica):
         tokens = analisar_expressao(expressao)
         print(f"Análise léxica gerou {len(tokens)} tokens")
         
+
         if options == "executar":
-            print("Iniciando análise sintática com Lark...")
-            arvore = analisar_pascal_lark(expressao)  # Usando Lark para análise sintática
-            msg = "Análise sintática com Lark concluída com sucesso!"
-            # Preenche a tabela sintática com o resultado
-            print("Chamando popular_tabela_sintatica...")
-            popular_tabela_sintatica(tree_sintatica)
+            print("Iniciando análise sintática com Lark (com múltiplos erros)...")
+            erros_sintaticos = analisar_pascal_lark_multierros_custom(expressao)
+            mostrar_erros_no_log(text_log, erros_sintaticos)
+            if not erros_sintaticos:
+                msg = "Análise sintática com Lark concluída com sucesso!"
+                text_log.config(state='normal')
+                text_log.insert('2.0', get_timestamp() + msg + "\n")
+                text_log.config(foreground='green')
+                text_log.config(state='disabled')
+                print("Chamando popular_tabela_sintatica...")
+                popular_tabela_sintatica(tree_sintatica)
+            # Se houver erro, já mostrou no log, não faz mais nada
+
             
         elif options == "analise_lexica":
             msg = "Análise léxica concluída com sucesso!"
@@ -140,3 +127,57 @@ def executar_analise(text_area, tree, text_log, options, tree_sintatica):
             text_log.config(foreground='green')  # Define a cor do texto como verde
         
         text_log.config(state='disabled')  # Desabilita a edição
+
+def mostrar_erros_no_log(text_log, lista_erros):
+    text_log.config(state='normal')
+    text_log.delete('1.0', tk.END)
+    if not lista_erros:
+        text_log.insert("1.0", "Nenhum erro sintático encontrado! :)\n")
+        text_log.config(foreground='green')
+    else:
+        for erro in lista_erros:
+            text_log.insert(tk.END, erro + "\n")
+        text_log.config(foreground='red')
+    text_log.config(state='disabled')
+
+def analisar_pascal_lark_multierros_custom(codigo_fonte, caminho_gramatica="grammar.lark"):
+    with open(caminho_gramatica, "r", encoding="utf-8") as f:
+        gramatica = f.read()
+    parser = Lark(gramatica, start="start", parser="lalr")
+    erros = []
+
+    try:
+        parser.parse(codigo_fonte)
+        # Se chegou aqui, não tem erro sintático
+        return []
+    except UnexpectedInput as e:
+        # Caso de erro, apenas 1º erro (ou adapte para multi-erro se quiser!)
+        trecho = e.get_context(codigo_fonte).replace('\n', '')
+        erro_msg = (
+            f"Erro sintático na linha {e.line}, coluna {e.column}: "
+            f"símbolo inesperado próximo de \"{trecho.strip()}\"."
+        )
+        erros.append(erro_msg)
+        return erros
+
+def analisar_expressao(codigo_fonte, caminho_gramatica="grammar.lark"):
+    with open(caminho_gramatica, "r", encoding="utf-8") as f:
+        gramatica = f.read()
+    parser = Lark(gramatica, start="start", parser="lalr")
+    erros = []
+
+    linhas = codigo_fonte.split('\n')
+    for i, linha in enumerate(linhas, start=1):
+        try:
+            if linha.strip():
+                parser.parse(linha)
+        except UnexpectedInput as e:
+            # Mensagem personalizada — sem detalhes internos do Lark!
+            trecho = e.get_context(linha).replace('\n', '')
+            erro_msg = (
+                f"Erro sintático na linha {i}, coluna {e.column}: "
+                f"símbolo inesperado próximo de \"{trecho.strip()}\"."
+            )
+            erros.append(erro_msg)
+
+    return erros
