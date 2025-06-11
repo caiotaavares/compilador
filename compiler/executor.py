@@ -1,4 +1,4 @@
-from compiler.syntatic_analyzer import tabela_sintatica
+from compiler.syntatic import tabela_sintatica
 from lark import Lark, UnexpectedInput
 from datetime import datetime
 import tkinter as tk
