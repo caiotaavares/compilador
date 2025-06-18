@@ -55,7 +55,7 @@ def executar_analise(text_area, tree, text_log, options):
             tokens = analisar_expressao(expressao)
             msg = "Análise léxica..."
             
-        elif (options == "analise_semantica"):
+        elif (options == "analise_semantica_lark"):
             try:
                 arvore = analisar_pascal_lark(expressao)  # onde expressao é o código Pascal do editor
                 print(arvore.pretty())  # ou mostre a árvore na interface

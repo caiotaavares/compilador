@@ -49,7 +49,7 @@ def criar_menu(root, text_area, tree, text_log):
     )
     menu_executar.add_command(
         label="Executar Análise Semântica",
-        command=lambda: executar_analise(text_area, tree, text_log, options="analise_semantica")
+        command=lambda: executar_analise(text_area, tree, text_log, options="analise_semantica_lark")
     )
     menubar.add_cascade(label="Executar", menu=menu_executar)
     
