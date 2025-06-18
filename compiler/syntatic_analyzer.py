@@ -6,19 +6,19 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_PROGRAM': ['PALAVRA_RESERVADA_PROGRAM', 'IDENTIFICADOR', 'PONTO_E_VIRGULA', 'bloco', 'PONTO']
     },
     'bloco': {
-        'PALAVRA_RESERVADA_INTEGER': ['decl_var_e_subrotinas', 'comando_composto'],
+        'PALAVRA_RESERVADA_INT': ['decl_var_e_subrotinas', 'comando_composto'],
         'PALAVRA_RESERVADA_BOOLEAN': ['decl_var_e_subrotinas', 'comando_composto'],
         'PALAVRA_RESERVADA_PROCEDURE': ['decl_var_e_subrotinas', 'comando_composto'],
         'PALAVRA_RESERVADA_BEGIN': ['decl_var_e_subrotinas', 'comando_composto']
     },
     'decl_var_e_subrotinas': {
-        'PALAVRA_RESERVADA_INTEGER': ['decl_var', 'decl_subrotinas'],
+        'PALAVRA_RESERVADA_INT': ['decl_var', 'decl_subrotinas'],
         'PALAVRA_RESERVADA_BOOLEAN': ['decl_var', 'decl_subrotinas'],
         'PALAVRA_RESERVADA_PROCEDURE': ['decl_subrotinas'],
         'PALAVRA_RESERVADA_BEGIN': ['ε']
     },
     'decl_var': {
-        'PALAVRA_RESERVADA_INTEGER': ['tipo', 'lista_identificadores', 'PONTO_E_VIRGULA', 'decl_var'],
+        'PALAVRA_RESERVADA_INT': ['tipo', 'lista_identificadores', 'PONTO_E_VIRGULA', 'decl_var'],
         'PALAVRA_RESERVADA_BOOLEAN': ['tipo', 'lista_identificadores', 'PONTO_E_VIRGULA', 'decl_var'],
         'PALAVRA_RESERVADA_PROCEDURE': ['ε'],
         'PALAVRA_RESERVADA_BEGIN': ['ε']
@@ -43,11 +43,11 @@ tabela_sintatica = {
         'FECHA_PARENTESES': ['ε']
     },
     'secao_parametros': {
-        'PALAVRA_RESERVADA_VAR': ['PALAVRA_RESERVADA_VAR', 'lista_identificadores', 'DOIS_PONTOS', 'tipo'],
-        'IDENTIFICADOR': ['lista_identificadores', 'DOIS_PONTOS', 'tipo']
+        'PALAVRA_RESERVADA_VAR': ['PALAVRA_RESERVADA_VAR', 'lista_identificadores', 'SEPARADOR', 'tipo'],
+        'IDENTIFICADOR': ['lista_identificadores', 'SEPARADOR', 'tipo']
     },
     'tipo': {
-        'PALAVRA_RESERVADA_INTEGER': ['PALAVRA_RESERVADA_INTEGER'],
+        'PALAVRA_RESERVADA_INT': ['PALAVRA_RESERVADA_INT'],
         'PALAVRA_RESERVADA_BOOLEAN': ['PALAVRA_RESERVADA_BOOLEAN']
     },
     'lista_identificadores': {
@@ -55,7 +55,7 @@ tabela_sintatica = {
     },
     'lista_identificadores_tail': {
         'VIRGULA': ['VIRGULA', 'IDENTIFICADOR', 'lista_identificadores_tail'],
-        'DOIS_PONTOS': ['ε'],
+        'SEPARADOR': ['ε'],
         'PONTO_E_VIRGULA': ['ε']
     },
     'comando_composto': {
@@ -69,19 +69,20 @@ tabela_sintatica = {
         'IDENTIFICADOR': ['atribuicao_ou_chamada'],
         'PALAVRA_RESERVADA_BEGIN': ['comando_composto'],
         'PALAVRA_RESERVADA_IF': ['comando_condicional'],
-        'PALAVRA_RESERVADA_WHILE': ['comando_repetitivo']
+        'PALAVRA_RESERVADA_WHILE': ['comando_repetitivo'],
+        'PALAVRA_RESERVADA_END': ['ε']  # <-- Permite bloco vazio
     },
     'atribuicao_ou_chamada': {
         'IDENTIFICADOR': ['IDENTIFICADOR', 'atribuicao_ou_chamada_tail']
     },
     'atribuicao_ou_chamada_tail': {
-        'OPERADOR_ATRIBUICAO': ['OPERADOR_ATRIBUICAO', 'expressao'],
+        'ATRIBUICAO': ['ATRIBUICAO', 'expressao'],
         'ABRE_PARENTESES': ['ABRE_PARENTESES', 'lista_de_expressões', 'FECHA_PARENTESES'],
         'PONTO_E_VIRGULA': ['ε']
     },
     'lista_de_expressões': {
         'IDENTIFICADOR': ['expressao', 'lista_de_expressões_tail'],
-        'INTEIRO': ['expressao', 'lista_de_expressões_tail']
+        'NUMERO_INTEIRO': ['expressao', 'lista_de_expressões_tail']
     },
     'lista_de_expressões_tail': {
         'VIRGULA': ['VIRGULA', 'expressao', 'lista_de_expressões_tail'],
@@ -91,40 +92,49 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_WHILE': ['PALAVRA_RESERVADA_WHILE', 'expressao', 'PALAVRA_RESERVADA_DO', 'comando']
     },
     'comando_condicional': {
-        'PALAVRA_RESERVADA_IF': ['PALAVRA_RESERVADA_IF', 'expressao', 'PALAVRA_RESERVADA_THEN', 'comando', 'comando_condicional_tail']
+        'PALAVRA_RESERVADA_IF': [
+            'PALAVRA_RESERVADA_IF',
+            'ABRE_PARENTESES',
+            'expressao',
+            'FECHA_PARENTESES',
+            'PALAVRA_RESERVADA_THEN',
+            'comando',
+            'comando_condicional_else'
+        ]
     },
-    'comando_condicional_tail': {
+    'comando_condicional_else': {
         'PALAVRA_RESERVADA_ELSE': ['PALAVRA_RESERVADA_ELSE', 'comando'],
         'PONTO_E_VIRGULA': ['ε'],
         'PALAVRA_RESERVADA_END': ['ε']
     },
     'expressao': {
         'IDENTIFICADOR': ['expressao_simples', 'expressao_relacional_tail'],
-        'INTEIRO': ['expressao_simples', 'expressao_relacional_tail']
+        'NUMERO_INTEIRO': ['expressao_simples', 'expressao_relacional_tail'],
+        'ABRE_PARENTESES': ['expressao_simples', 'expressao_relacional_tail']
     },
     'expressao_relacional_tail': {
-        'IGUALDADE': ['relação', 'expressao_simples'],
-        'DIFERENTE': ['relação', 'expressao_simples'],
-        'MAIOR': ['relação', 'expressao_simples'],
-        'MENOR': ['relação', 'expressao_simples'],
-        'MAIOR_IGUAL': ['relação', 'expressao_simples'],
-        'MENOR_IGUAL': ['relação', 'expressao_simples'],
+        'MENOR': ['operador_relacional', 'expressao_simples'],
+        'MAIOR': ['operador_relacional', 'expressao_simples'],
+        'MENOR_IGUAL': ['operador_relacional', 'expressao_simples'],
+        'MAIOR_IGUAL': ['operador_relacional', 'expressao_simples'],
+        'IGUALDADE': ['operador_relacional', 'expressao_simples'],
+        'DIFERENTE': ['operador_relacional', 'expressao_simples'],
+        'FECHA_PARENTESES': ['ε'],
         'PALAVRA_RESERVADA_THEN': ['ε'],
-        'PALAVRA_RESERVADA_DO': ['ε'],
-        'PONTO_E_VIRGULA': ['ε'],
-        'FECHA_PARENTESES': ['ε']
+        'PONTO_E_VIRGULA': ['ε']
     },
-    'relação': {
-        'IGUALDADE': ['IGUALDADE'],
-        'DIFERENTE': ['DIFERENTE'],
-        'MAIOR': ['MAIOR'],
+    'operador_relacional': {
         'MENOR': ['MENOR'],
+        'MAIOR': ['MAIOR'],
+        'MENOR_IGUAL': ['MENOR_IGUAL'],
         'MAIOR_IGUAL': ['MAIOR_IGUAL'],
-        'MENOR_IGUAL': ['MENOR_IGUAL']
+        'IGUALDADE': ['IGUALDADE'],
+        'DIFERENTE': ['DIFERENTE']
     },
     'expressao_simples': {
         'IDENTIFICADOR': ['termo', 'expressao_simples_tail'],
-        'INTEIRO': ['termo', 'expressao_simples_tail']
+        'NUMERO_INTEIRO': ['termo', 'expressao_simples_tail'],
+        'ABRE_PARENTESES': ['termo', 'expressao_simples_tail']  # <-- ADICIONE ESTA LINHA
     },
     'expressao_simples_tail': {
         'OPERADOR_SOMA': ['OPERADOR_SOMA', 'termo', 'expressao_simples_tail'],
@@ -143,7 +153,8 @@ tabela_sintatica = {
     },
     'termo': {
         'IDENTIFICADOR': ['fator', 'termo_tail'],
-        'INTEIRO': ['fator', 'termo_tail']
+        'NUMERO_INTEIRO': ['fator', 'termo_tail'],
+        'ABRE_PARENTESES': ['fator', 'termo_tail']
     },
     'termo_tail': {
         'OPERADOR_MULTIPLICACAO': ['OPERADOR_MULTIPLICACAO', 'fator', 'termo_tail'],
@@ -160,7 +171,8 @@ tabela_sintatica = {
     },
     'fator': {
         'IDENTIFICADOR': ['IDENTIFICADOR'],
-        'INTEIRO': ['INTEIRO']
+        'NUMERO_INTEIRO': ['NUMERO_INTEIRO'],
+        'ABRE_PARENTESES': ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES']
     }
 }
 
@@ -216,8 +228,8 @@ def analisar_declaracoes(tokens):
                     if simbolo != 'ε':
                         pilha.append(simbolo)
             else:
-                if 'ε' in tabela_sintatica[topo].values():
-                    continue  # ← AGORA aceita epsilon se não há produção para o lookahead
+                if any(producao == ['ε'] for producao in tabela_sintatica[topo].values()):
+                    continue
                 else:
                     erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Tentando recuperação...")
 
