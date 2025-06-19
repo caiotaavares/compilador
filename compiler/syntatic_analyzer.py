@@ -195,6 +195,10 @@ tabela_sintatica = {
     }
 }
 
+# ----------------------------------------------------------------------------
+# Parser sintático com checks semânticos
+# ----------------------------------------------------------------------------
+
 def analisar_declaracoes(tokens):
     pilha = ['$', 'programa']
     pos = 0

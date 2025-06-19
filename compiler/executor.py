@@ -1,7 +1,7 @@
 from compiler.lexer import analisar_expressao
 from compiler.syntatic_analyzer import analisar_declaracoes
 from compiler.syntatic_analyzer import analisar_pascal_lark
-
+from compiler.semantic_analyzer import build_symbol_table, check_semantics
 import tkinter as tk
 
 # ------------------------------------------------------------------------------
@@ -46,10 +46,14 @@ def executar_analise(text_area, tree, text_log, options):
     
     try:
         if (options == "executar"):
-            # Executa a análise léxica e sintática
             tokens = analisar_expressao(expressao)
             analisar_declaracoes(tokens)
-            
+            symtab = build_symbol_table(tokens)
+            semantic_errors = check_semantics(tokens, symtab)
+
+            if semantic_errors:
+                raise SyntaxError("\\n".join(semantic_errors))
+
         elif (options == "analise_lexica"):
             # Executa apenas a análise léxica
             tokens = analisar_expressao(expressao)
