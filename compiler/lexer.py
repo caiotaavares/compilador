@@ -131,20 +131,3 @@ def validar_identificador(match, limite=30):
     if len(lexema) > limite:
         return ('IDENTIFICADOR_INVALIDO', lexema)
     return ('IDENTIFICADOR', lexema)
-
-## ETC ##
-# [(re.compile('\\b(program|begin|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\\b'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79991c0>), 
-# (re.compile('\\bend\\.'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999260>), (re.compile('\\bend\\b'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999300>), 
-# (re.compile('[a-zA-Z_][a-zA-Z0-9_]*'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79993a0>), (re.compile('\\d+(\\.\\d+)?'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999440>), 
-# (re.compile(':='), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79994e0>), (re.compile(':'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999580>), 
-# (re.compile('=='), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999620>), (re.compile('<>'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79996c0>), 
-# (re.compile('<='), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999760>), (re.compile('>='), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999800>), 
-# (re.compile('<'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79998a0>), (re.compile('>'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999940>), 
-# (re.compile('\\('), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf79999e0>), (re.compile('\\)'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999a80>), 
-# (re.compile('\\{'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999b20>), (re.compile('\\}'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999bc0>), 
-# (re.compile('\\['), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999c60>), (re.compile('\\]'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999d00>), 
-# (re.compile('\\+'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999da0>), (re.compile('-'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999e40>), 
-# (re.compile('\\*'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999ee0>), (re.compile('/'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf7999f80>), 
-# (re.compile(';'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf799a020>), (re.compile(','), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf799a0c0>), 
-# (re.compile('//.*'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf799a160>), (re.compile('{.*?}'), <function analisar_expressao.<locals>.<lambda> at 0x7f9bf799a200>), 
-# (re.compile('\\s+'), None)]

@@ -71,7 +71,6 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_IF': ['comando_condicional'],
         'PALAVRA_RESERVADA_WHILE': ['comando_repetitivo'],
         'PALAVRA_RESERVADA_END': ['ε'],  # <-- Permite bloco vazio
-        # comandos de E/S
         'PALAVRA_RESERVADA_READ':  ['PALAVRA_RESERVADA_READ', 'ABRE_PARENTESES', 'lista_de_expressões', 'FECHA_PARENTESES'],
         'PALAVRA_RESERVADA_WRITE': ['PALAVRA_RESERVADA_WRITE','ABRE_PARENTESES', 'lista_de_expressões', 'FECHA_PARENTESES'],
     },
