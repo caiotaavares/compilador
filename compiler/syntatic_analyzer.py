@@ -110,7 +110,8 @@ tabela_sintatica = {
     'expressao': {
         'IDENTIFICADOR': ['expressao_simples', 'expressao_relacional_tail'],
         'NUMERO_INTEIRO': ['expressao_simples', 'expressao_relacional_tail'],
-        'ABRE_PARENTESES': ['expressao_simples', 'expressao_relacional_tail']
+        'ABRE_PARENTESES': ['expressao_simples', 'expressao_relacional_tail'],
+        'OPERADOR_SUBTRACAO':  ['expressao_simples', 'expressao_relacional_tail']
     },
     'expressao_relacional_tail': {
         'MENOR': ['operador_relacional', 'expressao_simples'],
@@ -134,7 +135,8 @@ tabela_sintatica = {
     'expressao_simples': {
         'IDENTIFICADOR': ['termo', 'expressao_simples_tail'],
         'NUMERO_INTEIRO': ['termo', 'expressao_simples_tail'],
-        'ABRE_PARENTESES': ['termo', 'expressao_simples_tail']  # <-- ADICIONE ESTA LINHA
+        'ABRE_PARENTESES': ['termo', 'expressao_simples_tail'],
+        'OPERADOR_SUBTRACAO': ['OPERADOR_SUBTRACAO', 'termo', 'expressao_simples_tail']
     },
     'expressao_simples_tail': {
         'OPERADOR_SOMA': ['OPERADOR_SOMA', 'termo', 'expressao_simples_tail'],
@@ -154,7 +156,8 @@ tabela_sintatica = {
     'termo': {
         'IDENTIFICADOR': ['fator', 'termo_tail'],
         'NUMERO_INTEIRO': ['fator', 'termo_tail'],
-        'ABRE_PARENTESES': ['fator', 'termo_tail']
+        'ABRE_PARENTESES': ['fator', 'termo_tail'],
+        'OPERADOR_SUBTRACAO': ['fator', 'termo_tail']
     },
     'termo_tail': {
         'OPERADOR_MULTIPLICACAO': ['OPERADOR_MULTIPLICACAO', 'fator', 'termo_tail'],
@@ -172,7 +175,8 @@ tabela_sintatica = {
     'fator': {
         'IDENTIFICADOR': ['IDENTIFICADOR'],
         'NUMERO_INTEIRO': ['NUMERO_INTEIRO'],
-        'ABRE_PARENTESES': ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES']
+        'ABRE_PARENTESES': ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES'],
+        'OPERADOR_SUBTRACAO': ['OPERADOR_SUBTRACAO', 'fator']
     }
 }
 
