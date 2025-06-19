@@ -228,18 +228,25 @@ def analisar_declaracoes(tokens):
 
         # Captura declaração de procedure
         if topo == 'PALAVRA_RESERVADA_PROCEDURE' and atual == 'PALAVRA_RESERVADA_PROCEDURE':
-            # consome 'procedure'
             pos += 1
-            # em seguida deve vir IDENTIFICADOR com o nome
             if token_atual() == 'IDENTIFICADOR':
                 declared_procs.append(tokens[pos]['lexema'])
+            continue
+
+        # Erro específico: IF sem THEN
+        if topo == 'PALAVRA_RESERVADA_THEN' and atual != 'PALAVRA_RESERVADA_THEN':
+            erros.append(f"Erro sintático: aguardado 'then' após 'if' na linha {linha_atual()}.")
+            continue
+        # Erro específico: WHILE sem DO
+        if topo == 'PALAVRA_RESERVADA_DO' and atual != 'PALAVRA_RESERVADA_DO':
+            erros.append(f"Erro sintático: aguardado 'do' após 'while' na linha {linha_atual()}.")
             continue
 
         if topo == 'ε':
             continue
 
         if topo == atual:
-            # Verifica chamada de procedure: IDENTIFICADOR seguido de '('.
+            # Captura chamada de procedure
             if atual == 'IDENTIFICADOR' and pos + 1 < tamanho and tokens[pos+1]['token'] == 'ABRE_PARENTESES':
                 nome = tokens[pos]['lexema']
                 if nome not in declared_procs:
@@ -272,11 +279,11 @@ def analisar_declaracoes(tokens):
                 break
 
     # Verifica procedimentos declarados mas não usados
-    # (se desejar, pode tratar como aviso ou erro)
     for proc in declared_procs:
-        # Se nunca foi chamada
-        if not any(t['lexema'] == proc and idx + 1 < len(tokens) and tokens[idx+1]['token'] == 'ABRE_PARENTESES'
-                   for idx, t in enumerate(tokens)):
+        if not any(
+            t['lexema'] == proc and idx + 1 < len(tokens) and tokens[idx+1]['token'] == 'ABRE_PARENTESES'
+            for idx, t in enumerate(tokens)
+        ):
             erros.append(f"Erro semântico: procedure declarada mas não usada '{proc}'.")
 
     if erros:
