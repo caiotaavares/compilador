@@ -14,25 +14,21 @@ def build_symbol_table(tokens):
         t = tokens[i]
 
         # programa <IDENTIFICADOR>
-        if t['token'] == 'PALAVRA_RESERVADA_PROGRAM':
-            # o próximo token deve ser o nome do programa
-            if i + 1 < n and tokens[i+1]['token'] == 'IDENTIFICADOR':
-                prog_name = tokens[i+1]['lexema']
-                table[prog_name] = { 'kind': 'prog', 'line': tokens[i+1]['linha'] }
-                # pular 'program' e o identificador
-                i += 2
-                continue
+        if t['token'] == 'PALAVRA_RESERVADA_PROGRAM' and i+1 < n and tokens[i+1]['token']=='IDENTIFICADOR':
+            prog_name = tokens[i+1]['lexema']
+            table[prog_name] = {'kind':'prog','line':tokens[i+1]['linha']}
+            i += 2
+            continue
 
         # declarações de variáveis: int/boolean
-        if t['token'] in ('PALAVRA_RESERVADA_INT', 'PALAVRA_RESERVADA_BOOLEAN'):
+        if t['token'] in ('PALAVRA_RESERVADA_INT','PALAVRA_RESERVADA_BOOLEAN'):
             tipo = 'int' if t['token'].endswith('INT') else 'boolean'
-            j = i + 1
-            # lista de identificadores separados por vírgula
-            while j < n and tokens[j]['token'] == 'IDENTIFICADOR':
+            j = i+1
+            while j < n and tokens[j]['token']=='IDENTIFICADOR':
                 name = tokens[j]['lexema']
-                table[name] = { 'kind': 'var', 'type': tipo, 'line': tokens[j]['linha'] }
+                table[name] = {'kind':'var','type':tipo,'line':tokens[j]['linha']}
                 j += 1
-                if j < n and tokens[j]['token'] == 'VIRGULA':
+                if j<n and tokens[j]['token']=='VIRGULA':
                     j += 1
                 else:
                     break
@@ -40,13 +36,13 @@ def build_symbol_table(tokens):
             continue
 
         # parâmetros formais: var x,y : tipo
-        if t['token'] == 'PALAVRA_RESERVADA_VAR':
-            j = i + 1
-            while j < n and tokens[j]['token'] == 'IDENTIFICADOR':
+        if t['token']=='PALAVRA_RESERVADA_VAR':
+            j = i+1
+            while j<n and tokens[j]['token']=='IDENTIFICADOR':
                 name = tokens[j]['lexema']
-                table[name] = { 'kind': 'param', 'line': tokens[j]['linha'] }
+                table[name] = {'kind':'param','line':tokens[j]['linha']}
                 j += 1
-                if j < n and tokens[j]['token'] == 'VIRGULA':
+                if j<n and tokens[j]['token']=='VIRGULA':
                     j += 1
                 else:
                     break
@@ -54,14 +50,12 @@ def build_symbol_table(tokens):
             continue
 
         # procedure <IDENTIFICADOR>
-        if t['token'] == 'PALAVRA_RESERVADA_PROCEDURE':
-            if i + 1 < n and tokens[i+1]['token'] == 'IDENTIFICADOR':
-                name = tokens[i+1]['lexema']
-                table[name] = { 'kind': 'proc', 'line': tokens[i+1]['linha'] }
-            i += 1
+        if t['token']=='PALAVRA_RESERVADA_PROCEDURE' and i+1<n and tokens[i+1]['token']=='IDENTIFICADOR':
+            name = tokens[i+1]['lexema']
+            table[name] = {'kind':'proc','line':tokens[i+1]['linha']}
+            i += 2
             continue
 
-        # caso nenhum, avançar
         i += 1
 
     return table
@@ -69,14 +63,34 @@ def build_symbol_table(tokens):
 
 def check_semantics(tokens, symtab):
     """
-    Retorna lista de mensagens de erro semântico para usos de identificadores não declarados.
+    Retorna lista de mensagens de erro semântico:
+     - identificadores não declarados,
+     - chamadas de procedures não declaradas,
+     - procedures declaradas mas não usadas.
     """
     erros = []
+    used_procs = set()
 
-    for t in tokens:
-        if t['token'] == 'IDENTIFICADOR':
+    # 1) Coleta chamadas de proc e verifica usos de identificadores
+    for idx, t in enumerate(tokens):
+        if t['token']=='IDENTIFICADOR':
             name = t['lexema']
-            # se não estiver na tabela de símbolos, é erro
-            if name not in symtab:
-                erros.append(f"Erro semântico: '{name}' não declarado na linha {t['linha']}." )
+            nxt = tokens[idx+1]['token'] if idx+1<len(tokens) else None
+            # chamada de procedure detectada: IDENT '(' mas não declaração
+            if nxt=='ABRE_PARENTESES' and not (idx>0 and tokens[idx-1]['token']=='PALAVRA_RESERVADA_PROCEDURE'):
+                used_procs.add(name)
+                info = symtab.get(name)
+                if info is None or info.get('kind')!='proc':
+                    erros.append(f"Erro semântico: chamada não declarada de procedure '{name}' na linha {t['linha']}." )
+            else:
+                # uso normal de var/prog/param
+                if name not in symtab:
+                    erros.append(f"Erro semântico: '{name}' não declarado na linha {t['linha']}." )
+
+    # 2) Verifica procedures declaradas mas não usadas
+    for name, info in symtab.items():
+        if info.get('kind')=='proc' and name not in used_procs:
+            erros.append(
+                f"Erro semântico: procedure declarada mas não usada '{name}' na linha {info.get('line')}.")
+
     return erros
