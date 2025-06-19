@@ -200,14 +200,13 @@ def analisar_declaracoes(tokens):
     pos = 0
     tamanho = len(tokens)
     
-    print(tokens)
-
+    # Lista de procedimentos declarados
+    declared_procs = []
+    
     sync_tokens = {}
-
     erros = []
 
     def token_atual():
-        # Protege para não sair do índice
         if pos < tamanho:
             return tokens[pos]['token']
         return '$'
@@ -224,57 +223,64 @@ def analisar_declaracoes(tokens):
 
     while pilha:
         topo = pilha.pop()
-
         atual = token_atual()
-        
         print(f"Pilha: {pilha} | Topo: {topo} | Token atual: {atual}")
+
+        # Captura declaração de procedure
+        if topo == 'PALAVRA_RESERVADA_PROCEDURE' and atual == 'PALAVRA_RESERVADA_PROCEDURE':
+            # consome 'procedure'
+            pos += 1
+            # em seguida deve vir IDENTIFICADOR com o nome
+            if token_atual() == 'IDENTIFICADOR':
+                declared_procs.append(tokens[pos]['lexema'])
+            continue
 
         if topo == 'ε':
             continue
 
         if topo == atual:
+            # Verifica chamada de procedure: IDENTIFICADOR seguido de '('.
+            if atual == 'IDENTIFICADOR' and pos + 1 < tamanho and tokens[pos+1]['token'] == 'ABRE_PARENTESES':
+                nome = tokens[pos]['lexema']
+                if nome not in declared_procs:
+                    erros.append(f"Erro semântico: chamada não declarada de procedure '{nome}' na linha {linha_atual()}.")
             pos += 1
-
-            # Se passou do fim, para o loop
             if pos > tamanho:
                 break
 
         elif topo in tabela_sintatica:
             producao = tabela_sintatica[topo].get(atual)
-
             if producao:
                 for simbolo in reversed(producao):
                     if simbolo != 'ε':
                         pilha.append(simbolo)
             else:
-                if any(producao == ['ε'] for producao in tabela_sintatica[topo].values()):
+                if any(prod == ['ε'] for prod in tabela_sintatica[topo].values()):
                     continue
-                else:
-                    erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Tentando recuperação...")
-
-                    sync_set = sync_tokens.get(topo, ['$'])
-                    while atual not in sync_set and atual != '$':
-                        pos += 1
-                        atual = token_atual()
-                    if atual == '$':
-                        break
-                # Não empilha nada para tentar continuar após sincronizar
+                erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Tentando recuperação...")
+                sync_set = sync_tokens.get(topo, ['$'])
+                while atual not in sync_set and atual != '$':
+                    pos += 1
+                    atual = token_atual()
+                if atual == '$':
+                    break
 
         else:
-            # topo é terminal mas diferente do atual (erro)
             erros.append(f"Erro sintático: token inesperado '{lexema_atual()}' na linha {linha_atual()}. Esperava '{topo}'. Tentando sincronizar...")
-
-            # Descarta token atual para tentar sincronizar
             pos += 1
-
-            # Se passou do fim, para o loop
             if pos > tamanho:
                 break
 
-            # Não empilha nada, tenta continuar
+    # Verifica procedimentos declarados mas não usados
+    # (se desejar, pode tratar como aviso ou erro)
+    for proc in declared_procs:
+        # Se nunca foi chamada
+        if not any(t['lexema'] == proc and idx + 1 < len(tokens) and tokens[idx+1]['token'] == 'ABRE_PARENTESES'
+                   for idx, t in enumerate(tokens)):
+            erros.append(f"Erro semântico: procedure declarada mas não usada '{proc}'.")
 
     if erros:
-        raise SyntaxError('\n'.join(erros))
+        raise SyntaxError("\n".join(erros))
 
     return True
 
