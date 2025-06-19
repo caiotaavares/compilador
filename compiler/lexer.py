@@ -10,26 +10,6 @@ def analisar_expressao(expressao):
     posicao = 0
     tamanho = len(expressao)
 
-    # Tabela de palavras reservadas
-    palavras_reservadas = {
-        "program": "PALAVRA_RESERVADA_PROGRAM",
-        "begin": "PALAVRA_RESERVADA_BEGIN",
-        "end": "PALAVRA_RESERVADA_END",
-        "if": "PALAVRA_RESERVADA_IF",
-        "then": "PALAVRA_RESERVADA_THEN",
-        "else": "PALAVRA_RESERVADA_ELSE",
-        "while": "PALAVRA_RESERVADA_WHILE",
-        "do": "PALAVRA_RESERVADA_DO",
-        "procedure": "PALAVRA_RESERVADA_PROCEDURE",
-        "var": "PALAVRA_RESERVADA_VAR",
-        "int": "PALAVRA_RESERVADA_INT",
-        "boolean": "PALAVRA_RESERVADA_BOOLEAN",
-        "true": "PALAVRA_RESERVADA_TRUE",
-        "false": "PALAVRA_RESERVADA_FALSE",
-        "read": "PALAVRA_RESERVADA_READ",
-        "write": "PALAVRA_RESERVADA_WRITE",
-    }
-
     # Definição das expressões regulares
     regex_tokens = [
         (r'\b(program|begin|if|then|else|while|do|procedure|var|int|boolean|true|false|read|write)\b', lambda match: ('PALAVRA_RESERVADA_' + match.group(0).upper(), match.group(0))),
