@@ -108,10 +108,13 @@ tabela_sintatica = {
         'PALAVRA_RESERVADA_END': ['ε']
     },
     'expressao': {
-        'IDENTIFICADOR': ['expressao_simples', 'expressao_relacional_tail'],
-        'NUMERO_INTEIRO': ['expressao_simples', 'expressao_relacional_tail'],
-        'ABRE_PARENTESES': ['expressao_simples', 'expressao_relacional_tail'],
-        'OPERADOR_SUBTRACAO':  ['expressao_simples', 'expressao_relacional_tail']
+        'IDENTIFICADOR':            ['expressao_simples', 'expressao_relacional_tail'],
+        'NUMERO_INTEIRO':           ['expressao_simples', 'expressao_relacional_tail'],
+        'ABRE_PARENTESES':          ['expressao_simples', 'expressao_relacional_tail'],
+        'OPERADOR_SUBTRACAO':       ['expressao_simples', 'expressao_relacional_tail'],
+        'OPERADOR_SOMA':            ['expressao_simples', 'expressao_relacional_tail'],
+        'PALAVRA_RESERVADA_TRUE':   ['expressao_simples', 'expressao_relacional_tail'],
+        'PALAVRA_RESERVADA_FALSE':  ['expressao_simples', 'expressao_relacional_tail']
     },
     'expressao_relacional_tail': {
         'MENOR': ['operador_relacional', 'expressao_simples'],
@@ -133,50 +136,60 @@ tabela_sintatica = {
         'DIFERENTE': ['DIFERENTE']
     },
     'expressao_simples': {
-        'IDENTIFICADOR': ['termo', 'expressao_simples_tail'],
-        'NUMERO_INTEIRO': ['termo', 'expressao_simples_tail'],
-        'ABRE_PARENTESES': ['termo', 'expressao_simples_tail'],
-        'OPERADOR_SUBTRACAO': ['OPERADOR_SUBTRACAO', 'termo', 'expressao_simples_tail']
+        'IDENTIFICADOR':            ['termo', 'expressao_simples_tail'],
+        'NUMERO_INTEIRO':           ['termo', 'expressao_simples_tail'],
+        'ABRE_PARENTESES':          ['termo', 'expressao_simples_tail'],
+        'OPERADOR_SUBTRACAO':       ['OPERADOR_SUBTRACAO', 'termo', 'expressao_simples_tail'],
+        'OPERADOR_SOMA':            ['OPERADOR_SOMA', 'termo', 'expressao_simples_tail'],
+        'PALAVRA_RESERVADA_TRUE':   ['termo', 'expressao_simples_tail'],
+        'PALAVRA_RESERVADA_FALSE':  ['termo', 'expressao_simples_tail']
     },
     'expressao_simples_tail': {
-        'OPERADOR_SOMA': ['OPERADOR_SOMA', 'termo', 'expressao_simples_tail'],
-        'OPERADOR_SUBTRACAO': ['OPERADOR_SUBTRACAO', 'termo', 'expressao_simples_tail'],
-        'PALAVRA_RESERVADA_OR': ['PALAVRA_RESERVADA_OR', 'termo', 'expressao_simples_tail'],
-        'PALAVRA_RESERVADA_THEN': ['ε'],
-        'PALAVRA_RESERVADA_DO': ['ε'],
-        'PONTO_E_VIRGULA': ['ε'],
-        'PALAVRA_RESERVADA_END': ['ε'],
-        'IGUALDADE': ['ε'],
-        'DIFERENTE': ['ε'],
-        'MAIOR': ['ε'],
-        'MENOR': ['ε'],
-        'MAIOR_IGUAL': ['ε'],
-        'MENOR_IGUAL': ['ε']
+        'OPERADOR_SOMA':            ['OPERADOR_SOMA', 'termo', 'expressao_simples_tail'],
+        'OPERADOR_SUBTRACAO':       ['OPERADOR_SUBTRACAO', 'termo', 'expressao_simples_tail'],
+        'PALAVRA_RESERVADA_OR':     ['PALAVRA_RESERVADA_OR', 'termo', 'expressao_simples_tail'],
+        # itens de FOLLOW para ε
+        'PALAVRA_RESERVADA_THEN':   ['ε'],
+        'PALAVRA_RESERVADA_DO':     ['ε'],
+        'PONTO_E_VIRGULA':          ['ε'],
+        'PALAVRA_RESERVADA_END':    ['ε'],
+        'IGUALDADE':                ['ε'],
+        'DIFERENTE':                ['ε'],
+        'MAIOR':                    ['ε'],
+        'MENOR':                    ['ε'],
+        'MAIOR_IGUAL':              ['ε'],
+        'MENOR_IGUAL':              ['ε']
     },
     'termo': {
-        'IDENTIFICADOR': ['fator', 'termo_tail'],
-        'NUMERO_INTEIRO': ['fator', 'termo_tail'],
-        'ABRE_PARENTESES': ['fator', 'termo_tail'],
-        'OPERADOR_SUBTRACAO': ['fator', 'termo_tail']
+        'IDENTIFICADOR':            ['fator', 'termo_tail'],
+        'NUMERO_INTEIRO':           ['fator', 'termo_tail'],
+        'ABRE_PARENTESES':          ['fator', 'termo_tail'],
+        'OPERADOR_SUBTRACAO':       ['fator', 'termo_tail'],  # unário já consumido em expresao_simples
+        'PALAVRA_RESERVADA_TRUE':   ['fator', 'termo_tail'],
+        'PALAVRA_RESERVADA_FALSE':  ['fator', 'termo_tail']
     },
     'termo_tail': {
-        'OPERADOR_MULTIPLICACAO': ['OPERADOR_MULTIPLICACAO', 'fator', 'termo_tail'],
-        'OPERADOR_DIV': ['OPERADOR_DIV', 'fator', 'termo_tail'],
-        'PALAVRA_RESERVADA_AND': ['PALAVRA_RESERVADA_AND', 'fator', 'termo_tail'],
-        'PALAVRA_RESERVADA_OR': ['ε'],
-        'OPERADOR_SOMA': ['ε'],
-        'OPERADOR_SUBTRACAO': ['ε'],
-        'PALAVRA_RESERVADA_THEN': ['ε'],
-        'PALAVRA_RESERVADA_DO': ['ε'],
-        'PALAVRA_RESERVADA_END': ['ε'],
-        'PONTO_E_VIRGULA': ['ε'],
-        'FECHA_PARENTESES': ['ε']
+        'OPERADOR_MULTIPLICACAO':   ['OPERADOR_MULTIPLICACAO', 'fator', 'termo_tail'],
+        'OPERADOR_DIV':             ['OPERADOR_DIV', 'fator', 'termo_tail'],
+        'PALAVRA_RESERVADA_AND':    ['PALAVRA_RESERVADA_AND', 'fator', 'termo_tail'],
+        # itens de FOLLOW para ε
+        'PALAVRA_RESERVADA_OR':     ['ε'],
+        'OPERADOR_SOMA':            ['ε'],
+        'OPERADOR_SUBTRACAO':       ['ε'],
+        'PALAVRA_RESERVADA_THEN':   ['ε'],
+        'PALAVRA_RESERVADA_DO':     ['ε'],
+        'PALAVRA_RESERVADA_END':    ['ε'],
+        'PONTO_E_VIRGULA':          ['ε'],
+        'FECHA_PARENTESES':         ['ε']
     },
     'fator': {
-        'IDENTIFICADOR': ['IDENTIFICADOR'],
-        'NUMERO_INTEIRO': ['NUMERO_INTEIRO'],
-        'ABRE_PARENTESES': ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES'],
-        'OPERADOR_SUBTRACAO': ['OPERADOR_SUBTRACAO', 'fator']
+        'IDENTIFICADOR':            ['IDENTIFICADOR'],
+        'NUMERO_INTEIRO':           ['NUMERO_INTEIRO'],
+        'ABRE_PARENTESES':          ['ABRE_PARENTESES', 'expressao', 'FECHA_PARENTESES'],
+        'OPERADOR_SUBTRACAO':       ['OPERADOR_SUBTRACAO', 'fator'],
+        'OPERADOR_SOMA':            ['OPERADOR_SOMA',      'fator'],
+        'PALAVRA_RESERVADA_TRUE':   ['PALAVRA_RESERVADA_TRUE'],
+        'PALAVRA_RESERVADA_FALSE':  ['PALAVRA_RESERVADA_FALSE']
     }
 }
 
