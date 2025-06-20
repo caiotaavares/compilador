@@ -1,8 +1,9 @@
 from compiler.lexer import analisar_expressao
 from compiler.syntatic_analyzer import analisar_declaracoes
-from compiler.syntatic_analyzer import analisar_pascal_lark
 from compiler.semantic_analyzer import build_symbol_table, check_semantics
+from compiler.bytecode import generate_bytecode
 import tkinter as tk
+from datetime import datetime
 
 # ------------------------------------------------------------------------------
 # 2. Função para popular o Treeview com o resultado da análise
@@ -52,6 +53,14 @@ def executar_analise(text_area, tree, text_log, options):
             semantic_errors = check_semantics(tokens, symtab)
             if semantic_errors:
                 raise SyntaxError("\n".join(semantic_errors))
+            bytecode = generate_bytecode(tokens)
+            # exiba no text_log ou em outro painel
+            text_log.config(state='normal')
+            text_log.delete('1.0', tk.END)
+            text_log.insert('1.0', "Bytecode gerado:\n" + "\n".join(bytecode))
+            text_log.config(foreground='black', state='disabled')
+            salvar_resultado(bytecode)
+            return
 
         elif options == "analise_lexica":
             # somente léxico: nada adicional a fazer
@@ -80,8 +89,12 @@ def executar_analise(text_area, tree, text_log, options):
     text_log.insert('1.0', get_timestamp() + "Análise concluída com sucesso!\n")
     text_log.config(foreground='green', state='disabled')
 
-# Função auxiliar para timestamp
-from datetime import datetime
 
 def get_timestamp():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S - ")
+
+def salvar_resultado(bytecode):
+    """Salva o bytecode no arquivo 'resultado' na raiz do projeto."""
+    with open('resultado', 'w', encoding='utf-8') as f:
+        for ins in bytecode:
+            f.write(ins + '\n')
