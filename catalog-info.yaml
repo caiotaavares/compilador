@@ -3,7 +3,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: meu-servico-com-kong
+  name: sisof
   description: Um serviço que é gerenciado pelo Kong
   annotations:
     # ✅ OBRIGATÓRIA: O nome ou ID do 'Service' DENTRO DO KONG
