@@ -1,22 +1,21 @@
+# catalog-info.yaml
+
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: compilador
-  description: Compilador para a matéria de compiladores
-  labels:
-    example.com/custom: custom_label_value
+  name: meu-servico-com-kong
+  description: Um serviço que é gerenciado pelo Kong
   annotations:
-    example.com/service-discovery: compilador
-    circleci.com/project-slug: github/example-org/artist-website
-  tags:
-    - python
-  links:
-    - url: https://admin.example-org.com
-      title: Admin Dashboard
-      icon: dashboard
-      type: admin-dashboard
+    # ✅ OBRIGATÓRIA: O nome ou ID do 'Service' DENTRO DO KONG
+    kong-manager/service-name: 'meu-servico-no-kong'
+    
+    # ✅ OBRIGATÓRIA: O 'id' que você definiu no app-config.yaml
+    # Pode listar várias instâncias, separadas por vírgula (sem espaço)
+    kong-manager/instance: 'kong-instance01'
+    
+    # OPCIONAL: Caminho para o seu arquivo OpenAPI
+    kong-manager/spec: openapi-swagger.yaml
 spec:
-  type: website
+  type: service
   lifecycle: production
-  owner: artist-relations-team
-  system: public-websites
+  owner: 'group:default/minha-equipe'
