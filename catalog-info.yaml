@@ -17,5 +17,4 @@ metadata:
     kong-manager/spec: openapi-swagger.yaml
 spec:
   type: service
-  lifecycle: production
-  owner: 'group:default/minha-equipe'
+  lifecycle: dev
